@@ -25,10 +25,10 @@ class DrawerWidgt extends StatelessWidget {
             child: UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: nboldprimarycolor),
               accountName: const Text(
-                "Okosisi Joseph",
+                "Ese Smith Echanomi",
                 style: TextStyle(fontSize: 18),
               ),
-              accountEmail: const Text("josephokosisi@gmail.com"),
+              accountEmail: const Text("esesmithechanomi@gmail.com"),
             ), //UserAccountDrawerHeader
           ), //DrawerHeader
 
