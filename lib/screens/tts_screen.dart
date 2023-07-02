@@ -98,7 +98,7 @@ class _TtsScreenState extends State<TtsScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Send TTS Message",

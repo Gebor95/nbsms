@@ -98,7 +98,7 @@ class _CallMessScreenState extends State<CallMessScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Call Message",

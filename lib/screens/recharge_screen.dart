@@ -87,7 +87,7 @@ class _RechargeScreenState extends State<RechargeScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Recharge Account",

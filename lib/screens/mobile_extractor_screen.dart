@@ -93,7 +93,7 @@ class _MobileExScreenState extends State<MobileExScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Mobile Extractor",

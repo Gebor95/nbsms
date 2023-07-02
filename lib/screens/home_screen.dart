@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: SingleChildScrollView(

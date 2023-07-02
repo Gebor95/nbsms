@@ -9,8 +9,8 @@ import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
 import 'package:nbsms/screens/tts_screen.dart';
 
-class DrawerWidgt extends StatelessWidget {
-  const DrawerWidgt({super.key});
+class DrawerWidget extends StatelessWidget {
+  const DrawerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +134,7 @@ class DrawerWidgt extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.whatsapp_sharp),
+            // leading: const Icon(Icons.whatsapp_sharp),
             title: const Text('Support'),
             onTap: () {
               goToReplace(context, const SplashScreen());

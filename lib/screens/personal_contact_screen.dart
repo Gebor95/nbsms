@@ -88,7 +88,7 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
                 ))
           ],
         ),
-        drawer: const DrawerWidgt(),
+        drawer: const DrawerWidget(),
         body: BodyColWidget(children: [
           const PageTitle(text: "Personal Contacts"),
           SizedBox(height: screenHeight(context) * 0.03),
