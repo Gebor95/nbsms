@@ -4,6 +4,7 @@ import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/call_message_screen.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
+import 'package:nbsms/screens/payment.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
@@ -114,7 +115,7 @@ class DrawerWidget extends StatelessWidget {
               ListTile(
                 title: const Text("Payments"),
                 onTap: () {
-                  //action on press
+                  goToPush(context, const PaymentHistory());
                 },
               ),
               ListTile(
