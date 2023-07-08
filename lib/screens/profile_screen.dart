@@ -27,9 +27,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: SingleChildScrollView(
         child: Column(children: [
-          Image.asset(
-            'assets/images/contact.png',
+          Container(
+            clipBehavior: Clip.none,
             width: double.infinity,
+            height: 300,
+            child: Image.asset(
+              'assets/images/contact.png',
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
           const Gap(20),
           const Padding(
@@ -41,12 +47,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "PHONE",
+                  "SENDER NAME",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                 ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Smith Okosisi",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+                Gap(20),
                 Divider(
                   height: 5,
                   color: Colors.black,
+                ),
+                Text(
+                  "PHONE",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
@@ -59,22 +82,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       Gap(1.0),
                       Spacer(),
-                      Icon(Icons.message),
                     ],
                   ),
                 ),
-                Text(
-                  "MOBILE",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-                ),
                 Gap(20),
-                Text(
-                  "EMAIL",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                ),
                 Divider(
                   height: 5,
                   color: Colors.black,
+                ),
+                Text(
+                  "EMAIL/USERNAME",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
@@ -87,35 +105,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ],
                   ),
-                ),
-                Text(
-                  "HOME",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-                ),
-                Gap(20),
-                Text(
-                  "ADDRESS",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                ),
-                Divider(
-                  height: 5,
-                  color: Colors.black,
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        "Test Address",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  "CUSTOM TAG",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
                 ),
               ],
             ),
