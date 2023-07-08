@@ -10,6 +10,8 @@ import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
 import 'package:nbsms/screens/tts_screen.dart';
 
+import '../screens/profile_screen.dart';
+
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
 
@@ -42,6 +44,7 @@ class DrawerWidget extends StatelessWidget {
                 title: const Text("Profile"),
                 onTap: () {
                   //action on press
+                  goToPush(context, const ProfileScreen());
                 },
               ),
               ListTile(
