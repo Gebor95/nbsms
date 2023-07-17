@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
-import 'package:nbsms/screens/call_message_screen.dart';
 import 'package:nbsms/screens/home_screen.dart';
+import 'package:nbsms/screens/login_screen.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
+
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
-import 'package:nbsms/screens/tts_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidgt extends StatelessWidget {
   const DrawerWidgt({super.key});
@@ -20,10 +21,10 @@ class DrawerWidgt extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: nboldprimarycolor,
+              color: nbPrimarydarker,
             ), //BoxDecoration
             child: UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: nboldprimarycolor),
+              decoration: BoxDecoration(color: nbPrimarydarker),
               accountName: const Text(
                 "Ese Smith Echanomi",
                 style: TextStyle(fontSize: 18),
@@ -41,12 +42,7 @@ class DrawerWidgt extends StatelessWidget {
                 title: const Text("Profile"),
                 onTap: () {
                   //action on press
-                },
-              ),
-              ListTile(
-                title: const Text("Pricing"),
-                onTap: () {
-                  //action on press
+                  //  goToPush(context, const ProfileScreen());
                 },
               ),
               ListTile(
@@ -65,32 +61,12 @@ class DrawerWidgt extends StatelessWidget {
               goToReplace(context, const MobileExScreen());
             },
           ),
-          ExpansionTile(
-            title: const Text("Messaging"),
-            leading: const Icon(Icons.chat), //add icon
-            childrenPadding: const EdgeInsets.only(left: 60), //children padding
-            children: [
-              ListTile(
-                title: const Text("Text Message"),
-                onTap: () {
-                  goToReplace(context, const HomeScreen());
-                },
-              ),
-              ListTile(
-                title: const Text("Call Message"),
-                onTap: () {
-                  //action on press
-                  goToReplace(context, const CallMessScreen());
-                },
-              ),
-              ListTile(
-                title: const Text("Text To Speech"),
-                onTap: () {
-                  //action on press
-                  goToReplace(context, const TtsScreen());
-                },
-              ),
-            ],
+          ListTile(
+            leading: const Icon(Icons.chat),
+            title: const Text('Send Message'),
+            onTap: () {
+              goToReplace(context, const HomeScreen());
+            },
           ),
           ListTile(
             leading: const Icon(Icons.contact_phone),
@@ -117,24 +93,22 @@ class DrawerWidgt extends StatelessWidget {
                   //action on press
                 },
               ),
-              ListTile(
-                title: const Text("Delivery"),
-                onTap: () {
-                  //action on press
-                },
-              ),
             ],
           ),
 
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () {
-              goToReplace(context, const SplashScreen());
+            onTap: () async {
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              await pref.clear();
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.whatsapp_sharp),
+            leading: const Icon(Icons.whatshot_sharp),
             title: const Text('Support'),
             onTap: () {
               goToReplace(context, const SplashScreen());
