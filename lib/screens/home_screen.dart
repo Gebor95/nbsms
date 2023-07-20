@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:nbsms/api_service/api.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -12,7 +12,6 @@ import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,40 +22,45 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String balance = "";
-  String currency = '';
-  String symbol = '';
-  String country = '';
-  String status = "";
 
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
-    var data = {
-      "username": username,
-      "password": password,
-      "action": "balance", // Use a different action to fetch the balance
-    };
-
-    final response = await http
-        .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
-
-    if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body);
-      setState(() {
-        balance = responseData['balance'].toString();
-        currency = responseData['currency'];
-        symbol = responseData['symbol'];
-        country = responseData['country'];
-      });
-    } else {
-      // Handle API call failure
-      setState(() {
-        balance = "Error fetching balance";
-      });
-    }
+    String fetchedBalance = await fetchBalance(
+        username, password); // Call the method from api_service.dart
+    setState(() {
+      balance =
+          fetchedBalance; // Update the balance variable with the fetched value
+    });
   }
+  // Future<void> _fetchBalance() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String username = prefs.getString('username') ?? '';
+  //   String password = prefs.getString('password') ?? '';
+
+  //   var data = {
+  //     "username": username,
+  //     "password": password,
+  //     "action": "balance", // Use a different action to fetch the balance
+  //   };
+
+  //   final response = await http
+  //       .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+
+  //   if (response.statusCode == 200) {
+  //     var responseData = jsonDecode(response.body);
+  //     setState(() {
+  //       balance = responseData['balance'].toString();
+  //     });
+  //   } else {
+  //     // Handle API call failure
+  //     setState(() {
+  //       balance = "Error fetching balance";
+  //     });
+  //   }
+  // }
 
   @override
   void initState() {

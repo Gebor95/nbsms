@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nbsms/api_service/api.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -9,6 +10,7 @@ import 'package:nbsms/widgets/body_singlescroll_widget.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RechargeScreen extends StatefulWidget {
   const RechargeScreen({super.key});
@@ -18,6 +20,26 @@ class RechargeScreen extends StatefulWidget {
 }
 
 class _RechargeScreenState extends State<RechargeScreen> {
+  String balance = "";
+  Future<void> _fetchBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    String fetchedBalance = await fetchBalance(
+        username, password); // Call the method from api_service.dart
+    setState(() {
+      balance =
+          fetchedBalance; // Update the balance variable with the fetched value
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +86,7 @@ class _RechargeScreenState extends State<RechargeScreen> {
             style: TextStyle(fontFamily: centurygothic, fontSize: 16.0),
             children: <TextSpan>[
               TextSpan(text: '₦', style: TextStyle(fontFamily: roboto)),
-              const TextSpan(text: '31,000.00'),
+              TextSpan(text: balance),
             ],
           ),
         ),
