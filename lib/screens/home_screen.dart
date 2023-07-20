@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:nbsms/api_service/api.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -10,6 +11,7 @@ import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,9 +21,51 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String balance = "";
+
+  Future<void> _fetchBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    String fetchedBalance = await fetchBalance(
+        username, password); // Call the method from api_service.dart
+    setState(() {
+      balance =
+          fetchedBalance; // Update the balance variable with the fetched value
+    });
+  }
+  // Future<void> _fetchBalance() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String username = prefs.getString('username') ?? '';
+  //   String password = prefs.getString('password') ?? '';
+
+  //   var data = {
+  //     "username": username,
+  //     "password": password,
+  //     "action": "balance", // Use a different action to fetch the balance
+  //   };
+
+  //   final response = await http
+  //       .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+
+  //   if (response.statusCode == 200) {
+  //     var responseData = jsonDecode(response.body);
+  //     setState(() {
+  //       balance = responseData['balance'].toString();
+  //     });
+  //   } else {
+  //     // Handle API call failure
+  //     setState(() {
+  //       balance = "Error fetching balance";
+  //     });
+  //   }
+  // }
+
   @override
   void initState() {
     super.initState();
+    _fetchBalance();
     Timer(const Duration(), () {
       showDialog(
         context: context,
@@ -102,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(fontFamily: centurygothic, fontSize: 16.0),
             children: <TextSpan>[
               TextSpan(text: '₦', style: TextStyle(fontFamily: roboto)),
-              const TextSpan(text: '31,000.00'),
+              TextSpan(text: balance),
             ],
           ),
         ),
