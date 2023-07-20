@@ -1,16 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_images.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
-import 'package:nbsms/model/provider.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/register_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
 import 'package:nbsms/widgets/submit_button.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,9 +23,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _emailController = TextEditingController();
-
-  final _passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController pwordController = TextEditingController();
 
   @override
   void initState() {
@@ -35,14 +35,52 @@ class _LoginScreenState extends State<LoginScreen> {
   void checkLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String? val = pref.getString("login");
-    if (val != null) {
+    if (val == "logged_in") {
       goToPush(context, const HomeScreen());
     }
   }
 
+  loginusrrqt() async {
+    var data = {
+      "username": emailController.text,
+      "password": pwordController.text,
+      "action": "login",
+    };
+    final response = await http
+        .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      if (data['status'] == "OK") {
+        // pageRoute()
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('username', emailController.text);
+        prefs.setString('password', pwordController.text);
+        pageRoute("logged_in");
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
+        // }
+        print(data['status']);
+      }
+      if (data['error'] != "") {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Invalid Credentials")));
+        print(data['error']);
+      }
+    } else {
+      print(response.body);
+    }
+  }
+
+  void pageRoute(String status) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setString("login", status);
+    goToPush(context, const HomeScreen());
+  }
+
   @override
   Widget build(BuildContext context) {
-    final loginProvider = Provider.of<LoginProvider>(context);
+    // final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
@@ -83,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: screenHeight(context) * 0.10),
                           Container(
-                            height: screenHeight(context) * 0.5,
+                            height: screenHeight(context) * 0.54,
                             width: screenWidth(context),
                             decoration: BoxDecoration(
                               color: nbSecondarycolor,
@@ -121,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     TextFormField(
                                         // onChanged: (value) =>
                                         //     loginModel.setUsername(value),
-                                        controller: _emailController,
+                                        controller: emailController,
                                         decoration: const InputDecoration(
                                           hintText: "Username | Email",
                                         ),
@@ -137,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     TextFormField(
                                       // onChanged: (value) =>
                                       //     loginModel.setPassword(value),
-                                      controller: _passwordController,
+                                      controller: pwordController,
                                       obscureText: true,
                                       //obscuringCharacter: '',
                                       decoration: const InputDecoration(
@@ -172,14 +210,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     SubmitButton(
                                       onTap: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          String username =
-                                              _emailController.text;
-                                          String password =
-                                              _passwordController.text;
-                                          loginProvider.login(
-                                              context, username, password);
-                                        }
+                                        // if (_formKey.currentState!.validate()) {
+                                        //   Provider.of<UserProvider>(context,
+                                        //           listen: false)
+                                        //       .loginusrrqt(context);
+                                        // }
+                                        loginusrrqt();
                                       },
                                       text: 'Login',
                                       bgcolor: nbPrimarycolor,
@@ -212,11 +248,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  void pageRoute(String status) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setString("login", status);
-    goToPush(context, const HomeScreen());
   }
 }

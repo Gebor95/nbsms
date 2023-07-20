@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
-import 'package:nbsms/screens/login_screen.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
-
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidgt extends StatelessWidget {
   const DrawerWidgt({super.key});
@@ -42,7 +39,6 @@ class DrawerWidgt extends StatelessWidget {
                 title: const Text("Profile"),
                 onTap: () {
                   //action on press
-                  //  goToPush(context, const ProfileScreen());
                 },
               ),
               ListTile(
@@ -99,12 +95,8 @@ class DrawerWidgt extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () async {
-              SharedPreferences pref = await SharedPreferences.getInstance();
-              await pref.clear();
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (route) => false);
+            onTap: () {
+              goToReplace(context, const SplashScreen());
             },
           ),
           ListTile(
