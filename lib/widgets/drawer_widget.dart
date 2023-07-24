@@ -82,7 +82,6 @@ class _DrawerWidgtState extends State<DrawerWidgt> {
     } else {
       print("Error fetching profile");
     }
-    const Text('Loading....');
   }
 
   @override
