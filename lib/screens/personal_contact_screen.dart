@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nbsms/api_service/api.dart';
+import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -20,7 +20,7 @@ class PersonalContScreen extends StatefulWidget {
 }
 
 class _PersonalContScreenState extends State<PersonalContScreen> {
-  String balance = "";
+  String balance = " Loading";
   bool nocontact = false;
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

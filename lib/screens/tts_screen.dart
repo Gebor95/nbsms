@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -10,6 +11,7 @@ import 'package:nbsms/widgets/body_singlescroll_widget.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TtsScreen extends StatefulWidget {
   const TtsScreen({super.key});
@@ -19,6 +21,27 @@ class TtsScreen extends StatefulWidget {
 }
 
 class _TtsScreenState extends State<TtsScreen> {
+  String balance = ' Loading';
+  Future<void> _fetchBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    String fetchedBalance = await fetchBalance(
+        username, password); // Call the method from api_service.dart
+    setState(() {
+      balance =
+          fetchedBalance; // Update the balance variable with the fetched value
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchBalance();
+  }
+
   // Initial Selected Value
   String dropdownvalue = 'New Contacts';
 
