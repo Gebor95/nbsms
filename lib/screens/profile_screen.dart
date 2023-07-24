@@ -48,7 +48,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(
         () {
           name = data['name'];
-          // username = data['username'];
           email = data['email'];
           mobile = data['mobile'];
           sender = data['sender'];

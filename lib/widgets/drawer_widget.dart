@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
@@ -9,20 +11,82 @@ import 'package:nbsms/screens/profile_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
-class DrawerWidgt extends StatelessWidget {
+class DrawerWidgt extends StatefulWidget {
   const DrawerWidgt({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    void logout() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.remove('username');
-      prefs.remove('password');
-      prefs.setString('login', 'logged_out');
-      goToPush(context, const SplashScreen());
-    }
+  State<DrawerWidgt> createState() => _DrawerWidgtState();
+}
 
+class _DrawerWidgtState extends State<DrawerWidgt> {
+  String? name = '';
+  String? email = '';
+  Future<void>? _fetchProfileFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileFuture = _fetchProfile();
+  }
+
+  @override
+  void dispose() {
+    // Cancel the asynchronous operation when the widget is disposed.
+    _fetchProfileFuture?.whenComplete(() {});
+    super.dispose();
+  }
+
+  Future<Map<String, dynamic>?> fetchProfile(
+      String username, String password) async {
+    var data = {
+      "username": username,
+      "password": password,
+      "action": "profile", // Use a different action to fetch the balance
+    };
+
+    final response = await http
+        .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+
+      setState(
+        () {
+          name = data['name'];
+          email = data['email'];
+        },
+      );
+
+      return responseData;
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> _fetchProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    Map<String, dynamic>? fetchedProfile = await fetchProfile(
+        username, password); // Call the method from api_service.dart
+    if (fetchedProfile != null) {
+      if (mounted) {
+        setState(() {
+          name = fetchedProfile['name'];
+          email = fetchedProfile['email'];
+        });
+      }
+    } else {
+      print("Error fetching profile");
+    }
+    const Text('Loading....');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: const EdgeInsets.all(0),
@@ -33,11 +97,13 @@ class DrawerWidgt extends StatelessWidget {
             ), //BoxDecoration
             child: UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: nbPrimarydarker),
-              accountName: const Text(
-                "Ese Smith Echanomi",
-                style: TextStyle(fontSize: 18),
+              accountName: Text(
+                name!,
+                style: const TextStyle(fontSize: 18),
               ),
-              accountEmail: const Text("esesmithechanomi@gmail.com"),
+              accountEmail: Text(
+                email!,
+              ),
             ), //UserAccountDrawerHeader
           ), //DrawerHeader
 
