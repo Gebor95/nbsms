@@ -57,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
         prefs.setString('username', emailController.text);
         prefs.setString('password', pwordController.text);
         pageRoute("logged_in");
+
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const HomeScreen()));
         // }

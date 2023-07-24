@@ -13,16 +13,15 @@ import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class SendMessage extends StatefulWidget {
+  const SendMessage({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<SendMessage> createState() => _SendMessageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  String balance = " Loading";
-
+class _SendMessageState extends State<SendMessage> {
+  String balance = ' Loading';
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
@@ -35,59 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
           fetchedBalance; // Update the balance variable with the fetched value
     });
   }
-  // Future<void> _fetchBalance() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
-
-  //   var data = {
-  //     "username": username,
-  //     "password": password,
-  //     "action": "balance", // Use a different action to fetch the balance
-  //   };
-
-  //   final response = await http
-  //       .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
-
-  //   if (response.statusCode == 200) {
-  //     var responseData = jsonDecode(response.body);
-  //     setState(() {
-  //       balance = responseData['balance'].toString();
-  //     });
-  //   } else {
-  //     // Handle API call failure
-  //     setState(() {
-  //       balance = "Error fetching balance";
-  //     });
-  //   }
-  // }
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     _fetchBalance();
-    Timer(const Duration(), () {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          scrollable: true,
-          title: Text(
-            'Dear valued customer',
-            style: TextStyle(fontSize: 17.0, fontWeight: fnt600),
-          ),
-          content: const Text(
-              'Please TEST your message to one or two numbers before sending it to BULK numbers. This is important because network providers have the explicit right to block any content or sender at their discretion without refund.\r\n\r\nPlease note that this does not affect API users who are sending pre-approved transactional messages.\r\n\r\nHowever, if you are having a delivery issue with your message, contact us and we shall be more than happy to assist.\r\n\r\nThank you so much for your kind patronage and understanding.'),
-          actions: [
-            TextButton(
-                style: TextButton.styleFrom(
-                    foregroundColor: nbSecondarycolor,
-                    backgroundColor: nbPrimarycolor),
-                onPressed: () => goToPop(context),
-                child: const Text("Ok")),
-          ],
-        ),
-      );
-    });
   }
 
   // Initial Selected Value
@@ -179,31 +131,31 @@ class _HomeScreenState extends State<HomeScreen> {
               const PageTitle(
                 text: "Text Message",
               ),
-              SizedBox(
-                height: screenHeight(context) * 0.06,
-              ),
-              DropdownButtonFormField(
-                value: dropdownvalue,
-                items: items.map((String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownvalue = newValue!;
-                  });
-                },
-                decoration: const InputDecoration(
-                  alignLabelWithHint: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
-                  ),
-                  labelText: "Select Contact",
-                ),
-              ),
+              // SizedBox(
+              //   height: screenHeight(context) * 0.06,
+              // ),
+              // DropdownButtonFormField(
+              //   value: dropdownvalue,
+              //   items: items.map((String items) {
+              //     return DropdownMenuItem(
+              //       value: items,
+              //       child: Text(items),
+              //     );
+              //   }).toList(),
+              //   onChanged: (String? newValue) {
+              //     setState(() {
+              //       dropdownvalue = newValue!;
+              //     });
+              //   },
+              //   decoration: const InputDecoration(
+              //     alignLabelWithHint: true,
+              //     border: OutlineInputBorder(
+              //       borderSide: BorderSide(
+              //           width: 1, color: Colors.greenAccent), //<-- SEE HERE
+              //     ),
+              //     labelText: "Select Contact",
+              //   ),
+              // ),
               SizedBox(
                 height: screenHeight(context) * 0.02,
               ),
@@ -250,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SubmitButton(
                 onTap: () {
-                  goToReplace(context, const HomeScreen());
+                  goToReplace(context, const SendMessage());
                 },
                 text: 'Send Message',
                 bgcolor: nbPrimarycolor,

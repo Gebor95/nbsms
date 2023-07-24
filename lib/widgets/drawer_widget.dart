@@ -2,16 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
+import 'package:nbsms/screens/login_screen.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
+import 'package:nbsms/screens/profile_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidgt extends StatelessWidget {
   const DrawerWidgt({super.key});
 
   @override
   Widget build(BuildContext context) {
+    void logout() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('username');
+      prefs.remove('password');
+      prefs.setString('login', 'logged_out');
+      goToPush(context, const SplashScreen());
+    }
+
     return Drawer(
       child: ListView(
         padding: const EdgeInsets.all(0),
@@ -39,6 +50,7 @@ class DrawerWidgt extends StatelessWidget {
                 title: const Text("Profile"),
                 onTap: () {
                   //action on press
+                  goToPush(context, const ProfileScreen());
                 },
               ),
               ListTile(
@@ -95,8 +107,13 @@ class DrawerWidgt extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () {
-              goToReplace(context, const SplashScreen());
+            onTap: () async {
+              SharedPreferences pref = await SharedPreferences.getInstance();
+              await pref.clear();
+
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false);
             },
           ),
           ListTile(

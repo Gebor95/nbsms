@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nbsms/api_service/api.dart';
+import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -26,7 +26,7 @@ class _MobileExScreenState extends State<MobileExScreen> {
     isExtract = true;
   }
 
-  String balance = "";
+  String balance = " Loading";
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
