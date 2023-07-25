@@ -8,10 +8,11 @@ import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/drawer_widget.dart';
 
 class SendMessage extends StatefulWidget {
   const SendMessage({super.key});
@@ -121,7 +122,7 @@ class _SendMessageState extends State<SendMessage> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: SingleChildScrollView(

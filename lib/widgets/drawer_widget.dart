@@ -1,26 +1,28 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/login_screen.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
+import 'package:nbsms/screens/payment_history.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
 import 'package:nbsms/screens/profile_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
+import 'package:nbsms/widgets/message_history_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
-class DrawerWidgt extends StatefulWidget {
-  const DrawerWidgt({super.key});
+class DrawerWidget extends StatefulWidget {
+  const DrawerWidget({super.key});
 
   @override
-  State<DrawerWidgt> createState() => _DrawerWidgtState();
+  State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
-class _DrawerWidgtState extends State<DrawerWidgt> {
+class _DrawerWidgetState extends State<DrawerWidget> {
   String? name = '';
   String? email = '';
   Future<void>? _fetchProfileFuture;
@@ -157,13 +159,13 @@ class _DrawerWidgtState extends State<DrawerWidgt> {
               ListTile(
                 title: const Text("Messages"),
                 onTap: () {
-                  //action on press
+                  goToPush(context, const MessageWidget());
                 },
               ),
               ListTile(
                 title: const Text("Payments"),
                 onTap: () {
-                  //action on press
+                  goToPush(context, const PaymentHistory());
                 },
               ),
             ],
