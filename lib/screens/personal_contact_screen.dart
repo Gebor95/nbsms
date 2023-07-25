@@ -7,10 +7,11 @@ import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/body_colum_widget.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/personal_contact_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/drawer_widget.dart';
 
 class PersonalContScreen extends StatefulWidget {
   const PersonalContScreen({super.key});
@@ -110,7 +111,7 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
                 ))
           ],
         ),
-        drawer: const DrawerWidgt(),
+        drawer: const DrawerWidget(),
         body: BodyColWidget(children: [
           const PageTitle(text: "Personal Contacts"),
           SizedBox(height: screenHeight(context) * 0.03),

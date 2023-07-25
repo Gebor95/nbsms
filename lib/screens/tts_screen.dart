@@ -8,10 +8,11 @@ import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/body_singlescroll_widget.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/drawer_widget.dart';
 
 class TtsScreen extends StatefulWidget {
   const TtsScreen({super.key});
@@ -121,7 +122,7 @@ class _TtsScreenState extends State<TtsScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Send TTS Message",
