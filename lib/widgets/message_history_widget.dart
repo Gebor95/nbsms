@@ -106,27 +106,6 @@ class _MessageWidgetState extends State<MessageWidget> {
     });
   }
 
-  // void _filterReports(String selectedStatus) {
-  //   setState(() {
-  //     if (selectedStatus == 'Delivered') {
-  //       filteredReports =
-  //           reports.where((report) => report['status'] == 'DELIVERED').toList();
-  //     } else if (selectedStatus == 'Submitted') {
-  //       filteredReports =
-  //           reports.where((report) => report['status'] == 'Submitted').toList();
-  //     } else if (selectedStatus == 'DND') {
-  //       filteredReports =
-  //           reports.where((report) => report['status'] == 'DND-ST/1').toList();
-  //     } else if (selectedStatus == 'Failed') {
-  //       filteredReports =
-  //           reports.where((report) => report['status'] == 'FAILED').toList();
-  //     } else {
-  //       // If an unknown status is selected, show all reports
-  //       filteredReports = reports;
-  //     }
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(

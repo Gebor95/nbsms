@@ -1,12 +1,11 @@
-import 'dart:convert';
-
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:http/http.dart' as http;
+import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/constant_colors.dart';
 import '../constant/constant_fonts.dart';
@@ -21,19 +20,40 @@ class PaymentHistory extends StatefulWidget {
 }
 
 class _PaymentHistoryState extends State<PaymentHistory> {
-  void fetchPayment() async {
-    //print('fetch payment here');
-    const String username = 'ospivvsms@gmail.com';
-    const String password = 'ospivv2018';
+  String balance = " Loading";
 
-    const url =
-        "http://portal.fastsmsnigeria.com/api/?username=$username&password=$password&action=payments";
-    final uri = Uri.parse(url);
-    final response = await http.get(uri);
-    final body = response.body;
-    final json = jsonDecode(body);
-    print(json);
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
   }
+
+  Future<void> _fetchBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    String fetchedBalance = await fetchBalance(
+        username, password); // Call the method from api_service.dart
+    setState(() {
+      balance = fetchedBalance;
+      // Update the balance variable with the fetched value
+    });
+  }
+
+  // void fetchPayment() async {
+  //   //print('fetch payment here');
+  //   const String username = 'ospivvsms@gmail.com';
+  //   const String password = 'ospivv2018';
+
+  //   const url =
+  //       "http://portal.fastsmsnigeria.com/api/?username=$username&password=$password&action=payments";
+  //   final uri = Uri.parse(url);
+  //   final response = await http.get(uri);
+  //   final body = response.body;
+  //   final json = jsonDecode(body);
+  //   print(json);
+  // }
 
   final List smsPaymentDate = [
     '2023-07-2',
@@ -97,7 +117,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
             style: TextStyle(fontFamily: centurygothic, fontSize: 16.0),
             children: <TextSpan>[
               TextSpan(text: '₦', style: TextStyle(fontFamily: roboto)),
-              const TextSpan(text: '31,000.00'),
+              TextSpan(text: balance),
             ],
           ),
         ),
@@ -125,25 +145,28 @@ class _PaymentHistoryState extends State<PaymentHistory> {
         children: [
           Row(
             children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Gap(10),
-                  Text(
-                    '   Payment History',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    "    Total: ₦31,000",
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600),
-                  )
-                ],
+              const Padding(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Gap(10),
+                    Text(
+                      'Payment History',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      "Total: ₦31,000",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600),
+                    )
+                  ],
+                ),
               ),
               const Spacer(),
               Container(
