@@ -6,13 +6,13 @@ import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/login_screen.dart';
+import 'package:nbsms/screens/message_details.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
 import 'package:nbsms/screens/payment_history.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
 import 'package:nbsms/screens/profile_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
-import 'package:nbsms/widgets/message_history_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -160,7 +160,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ListTile(
                 title: const Text("Messages"),
                 onTap: () {
-                  goToPush(context, const MessageWidget());
+                  goToPush(context, const MessageDetailScreen());
                 },
               ),
               ListTile(

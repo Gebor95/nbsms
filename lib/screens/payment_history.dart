@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:http/http.dart' as http;
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
@@ -21,20 +18,6 @@ class PaymentHistory extends StatefulWidget {
 }
 
 class _PaymentHistoryState extends State<PaymentHistory> {
-  void fetchPayment() async {
-    //print('fetch payment here');
-    const String username = 'ospivvsms@gmail.com';
-    const String password = 'ospivv2018';
-
-    const url =
-        "http://portal.fastsmsnigeria.com/api/?username=$username&password=$password&action=payments";
-    final uri = Uri.parse(url);
-    final response = await http.get(uri);
-    final body = response.body;
-    final json = jsonDecode(body);
-    print(json);
-  }
-
   final List smsPaymentDate = [
     '2023-07-2',
     '2023-04-3',

@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 
 import '../constant/constant_colors.dart';
 import '../constant/constant_fonts.dart';
 import '../constant/constant_mediaquery.dart';
 import '../navigators/goto_helper.dart';
+import 'drawer_widget.dart';
 
-class MessageWidget extends StatefulWidget {
-  const MessageWidget({super.key});
+class MessageHistoryWidget extends StatefulWidget {
+  const MessageHistoryWidget({super.key});
 
   @override
-  State<MessageWidget> createState() => _MessageWidgetState();
+  State<MessageHistoryWidget> createState() => _MessageHistoryWidgetState();
 }
 
-class _MessageWidgetState extends State<MessageWidget> {
+class _MessageHistoryWidgetState extends State<MessageHistoryWidget> {
   final List dateAndTime = [
     '2023-07-2',
     '2023-04-3',
