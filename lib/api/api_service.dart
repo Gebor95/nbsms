@@ -38,6 +38,27 @@ Future<String> fetchProfile(String username, String password) async {
   }
 }
 
+Future<List<Map<String, dynamic>>> fetchReports(
+    String username, String password) async {
+  var url = Uri.parse("https://portal.fastsmsnigeria.com/api/");
+
+  var data = {
+    "username": username,
+    "password": password,
+    "action": "reports",
+  };
+
+  final response = await http.post(url, body: data);
+
+  if (response.statusCode == 200) {
+    List<dynamic> responseData = jsonDecode(response.body);
+    print(responseData);
+    return responseData.cast<Map<String, dynamic>>();
+  } else {
+    throw Exception("Failed to fetch reports.");
+  }
+}
+
 Future<List<Contact>> fetchContacts(String username, String password) async {
   var data = {
     "username": username,

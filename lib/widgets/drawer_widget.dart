@@ -82,9 +82,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         });
       }
     } else {
-      print("Error fetching profile");
+      // print("Error fetching profile");
     }
-    const Text('Loading....');
   }
 
   @override

@@ -36,32 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
           fetchedBalance; // Update the balance variable with the fetched value
     });
   }
-  // Future<void> _fetchBalance() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
-
-  //   var data = {
-  //     "username": username,
-  //     "password": password,
-  //     "action": "balance", // Use a different action to fetch the balance
-  //   };
-
-  //   final response = await http
-  //       .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
-
-  //   if (response.statusCode == 200) {
-  //     var responseData = jsonDecode(response.body);
-  //     setState(() {
-  //       balance = responseData['balance'].toString();
-  //     });
-  //   } else {
-  //     // Handle API call failure
-  //     setState(() {
-  //       balance = "Error fetching balance";
-  //     });
-  //   }
-  // }
 
   @override
   void initState() {
