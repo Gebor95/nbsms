@@ -126,39 +126,6 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
           return const Center(child: CircularProgressIndicator());
         },
       ),
-      // ListView.builder(
-      //   itemCount: contacts.length,
-      //   itemBuilder: (context, index) {
-      //     final contact = contacts[index];
-      //     return Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: [
-      //         ListTile(
-      //           contentPadding: EdgeInsets.symmetric(
-      //               horizontal: screenWidth(context) * 0.01,
-      //               vertical: screenHeight(context) * 0.01),
-      //           leading: CircleAvatar(
-      //             backgroundColor: nbPrimarycolor,
-      //             child: Icon(
-      //               Icons.person,
-      //               color: nbSecondarycolor,
-      //             ),
-      //           ),
-      //           title: Text(contact['name']),
-      //           subtitle: Text(contact['mobile']),
-      //           trailing: IconButton(
-      //               onPressed: () {
-      //                 goToPush(context, const SendMessage());
-      //               },
-      //               icon: Icon(
-      //                 Icons.chat,
-      //                 color: nbPrimarycolor,
-      //               )),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
 }
