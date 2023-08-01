@@ -2,6 +2,7 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:nbsms/api/api_service.dart';
+import 'package:nbsms/screens/message_detail_screen.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
@@ -271,7 +272,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                               ),
                               const Center(
                                 child: Text(
-                                  " No Message Report Yet!",
+                                  "No Message Report Yet!",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 25,
@@ -290,43 +291,48 @@ class _MessageWidgetState extends State<MessageWidget> {
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ListTile(
-                                shape: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  borderSide:
-                                      const BorderSide(color: Colors.black26),
-                                ),
-                                leading: Icon(
-                                  statusIcons[status],
-                                  color: statusColors[status],
-                                  size: 30,
-                                ),
-                                trailing: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 40,
-                                  color: Colors.black,
-                                ),
-                                title: Text(reportData['send_date']),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      status,
-                                      style: TextStyle(
-                                        color: statusColors[status],
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
+                              child: InkWell(
+                                onTap: () => goToPush(
+                                    context, const MessageDetailScreen()),
+                                child: ListTile(
+                                  shape: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black26),
+                                  ),
+                                  leading: Icon(
+                                    statusIcons[status],
+                                    color: statusColors[status],
+                                    size: 30,
+                                  ),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 40,
+                                    color: Colors.black,
+                                  ),
+                                  title: Text(reportData['send_date']),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        status,
+                                        style: TextStyle(
+                                          color: statusColors[status],
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      reportData['mobile'].toString(),
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
+                                      Text(
+                                        reportData['mobile'].toString(),
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
