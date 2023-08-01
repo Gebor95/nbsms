@@ -1,6 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:nbsms/model/message_model.dart';
+
 Future<String> fetchBalance(String username, String password) async {
   var data = {
     "username": username,
@@ -56,6 +58,51 @@ Future<List<Map<String, dynamic>>> fetchReports(
     return responseData.cast<Map<String, dynamic>>();
   } else {
     throw Exception("Failed to fetch reports.");
+  }
+}
+
+Future<List<MessageDetails>> fetchMessageDetails(
+    String username, String password) async {
+  // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint that returns the message history data.
+  var url = Uri.parse("https://portal.fastsmsnigeria.com/api/");
+  var data = {
+    "username": username,
+    "password": password,
+    "action": "history",
+  };
+
+  final response = await http.post(url, body: data);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    print(data);
+    return List<MessageDetails>.from(
+        data.map((messageJson) => MessageDetails.fromJson(messageJson)));
+  } else {
+    throw Exception('Failed to fetch message details');
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchPayment(
+    String username, String password) async {
+  var url = Uri.parse("https://portal.fastsmsnigeria.com/api/");
+
+  var data = {
+    "username": username,
+    "password": password,
+    "action": "payments",
+  };
+
+  final response = await http.post(url, body: data);
+
+  if (response.statusCode == 200) {
+    List<Map<String, dynamic>> responseData =
+        List<Map<String, dynamic>>.from(json.decode(response.body));
+    //List<dynamic> responseData = jsonDecode(response.body);
+    print(responseData);
+    return responseData.cast<Map<String, dynamic>>();
+  } else {
+    throw Exception("Failed to fetch payments.");
   }
 }
 

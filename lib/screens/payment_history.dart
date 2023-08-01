@@ -21,11 +21,15 @@ class PaymentHistory extends StatefulWidget {
 
 class _PaymentHistoryState extends State<PaymentHistory> {
   String balance = " Loading";
+  List<Map<String, dynamic>> history = [];
+  bool paymentFetched = false;
+  String selectedStatus = 'All';
 
   @override
   void initState() {
     super.initState();
     _fetchBalance();
+    fetchPaymentHistory(selectedStatus);
   }
 
   Future<void> _fetchBalance() async {
@@ -41,33 +45,53 @@ class _PaymentHistoryState extends State<PaymentHistory> {
     });
   }
 
-  // void fetchPayment() async {
-  //   //print('fetch payment here');
-  //   const String username = 'ospivvsms@gmail.com';
-  //   const String password = 'ospivv2018';
+  // Future<void> fetchPaymentHistory() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String username = prefs.getString('username') ?? '';
+  //   String password = prefs.getString('password') ?? '';
 
-  //   const url =
-  //       "http://portal.fastsmsnigeria.com/api/?username=$username&password=$password&action=payments";
-  //   final uri = Uri.parse(url);
-  //   final response = await http.get(uri);
-  //   final body = response.body;
-  //   final json = jsonDecode(body);
-  //   print(json);
+  //   try {
+  //     List<Map<String, dynamic>> fetchedPayment =
+  //         await fetchPayment(username, password);
+  //     setState(() {
+  //       history = fetchedPayment;
+  //       paymentFetched = true;
+  //       // Filter the reports based on selected status
+  //     });
+  //   } catch (e) {
+  //     print("Error fetching reports: $e");
+  //     // Handle the error as needed
+  //   }
   // }
+  Future<void> fetchPaymentHistory(String selectedStatus) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
 
-  final List smsPaymentDate = [
-    '2023-07-2',
-    '2023-04-3',
-    '2023-02-22',
-    '2023-01-03'
-  ];
-  final List referenceResponse = [
-    'OFFLINE RECHARGE',
-    'ONLINE RECHARGE',
-    'ONLINE RECHARGE',
-    'OFFLINE RECHARGE'
-  ];
-  final List smsPaymentAmount = ['₦ 31,000', '₦ 1,000', '₦ 310', '₦ 3,100'];
+    try {
+      List<Map<String, dynamic>> fetchedPayment =
+          await fetchPayment(username, password);
+
+      // Filter the payment history based on the selected status
+
+      if (selectedStatus != 'All') {
+        fetchedPayment = fetchedPayment.where((payment) {
+          bool isOfflineRecharge = payment['reference'] == null;
+          return isOfflineRecharge
+              ? selectedStatus == 'Offline'
+              : selectedStatus == 'Online';
+        }).toList();
+      }
+
+      setState(() {
+        history = fetchedPayment;
+        paymentFetched = true;
+      });
+    } catch (e) {
+      print("Error fetching reports: $e");
+      // Handle the error as needed
+    }
+  }
 
   final smsCatCtrl = TextEditingController();
   @override
@@ -145,22 +169,23 @@ class _PaymentHistoryState extends State<PaymentHistory> {
         children: [
           Row(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 20, right: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Gap(10),
+                    const Gap(10),
                     Text(
                       'Payment History',
                       style: TextStyle(
+                          fontFamily: roboto,
                           color: Colors.black,
                           fontSize: 23,
                           fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      "Total: ₦31,000",
-                      style: TextStyle(
+                      "Total: ₦$balance",
+                      style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 17,
                           fontWeight: FontWeight.w600),
@@ -195,49 +220,97 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                     'Online',
                   ],
                   controller: smsCatCtrl,
+                  onChanged: (selectedValue) {
+                    setState(() {
+                      selectedStatus = selectedValue;
+                    });
+                    fetchPaymentHistory(selectedStatus);
+                  },
                 ),
               ),
             ],
           ),
           const Gap(20),
           Expanded(
-            child: ListView.builder(
-              itemCount: smsPaymentAmount.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                      shape: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(color: Colors.black26)),
-                      trailing: const Icon(
-                        Icons.wallet_rounded,
-                        size: 40,
-                        color: Colors.green,
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(smsPaymentDate[index]),
-                          Text(
-                            referenceResponse[index],
-                            style: const TextStyle(
-                                color: Colors.green,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            smsPaymentAmount[index],
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      )),
-                );
-              },
-            ),
+            child: paymentFetched
+                ? history.isEmpty
+                    ? Container(
+                        clipBehavior: Clip.none,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: screenHeight(context) * 0.10,
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              width: screenWidth(context) * 0.60,
+                              height: screenWidth(context) * 0.60,
+                              decoration: BoxDecoration(
+                                color: nbPrimarycolor,
+                              ),
+                              child: Image.asset(
+                                'assets/images/messages.jpg',
+                                scale: 0.5,
+                              ),
+                            ),
+                            SizedBox(
+                              height: screenHeight(context) * 0.03,
+                            ),
+                            const Center(
+                              child: Text(
+                                "No Payment History Yet!",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 25,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: history.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                                shape: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(
+                                        color: Colors.black26)),
+                                trailing: const Icon(
+                                  Icons.wallet_rounded,
+                                  size: 40,
+                                  color: Colors.green,
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(history[index]['date']),
+                                    Text(
+                                      history[index]['reference'] == null
+                                          ? 'OFFLINE RECHARGE'
+                                          : 'ONLINE RECHARGE',
+                                      style: const TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(
+                                      '₦ ${history[index]['amount']}',
+                                      style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                )),
+                          );
+                        },
+                      )
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  ),
           ),
         ],
       ),
