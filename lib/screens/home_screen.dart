@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String balance = " Loading";
+  Timer? _alertTimer;
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
@@ -114,17 +115,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
     String fetchedBalance = await fetchBalance(
         username, password); // Call the method from api_service.dart
-    setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
-    });
+    if (mounted) {
+      // Check if the widget is still mounted
+      setState(() {
+        balance =
+            fetchedBalance; // Update the balance variable with the fetched value
+      });
+    }
   }
+
+  // Future<void> _fetchBalance() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String username = prefs.getString('username') ?? '';
+  //   String password = prefs.getString('password') ?? '';
+
+  //   String fetchedBalance = await fetchBalance(
+  //       username, password); // Call the method from api_service.dart
+  //   setState(() {
+  //     balance =
+  //         fetchedBalance; // Update the balance variable with the fetched value
+  //   });
+  // }
 
   @override
   void initState() {
     super.initState();
     _fetchBalance();
-    Timer(const Duration(), () {
+    _startAlertTimer();
+  }
+
+  @override
+  void dispose() {
+    _alertTimer?.cancel(); // Cancel the timer if it's active
+    recipientsController.dispose();
+    senderNameController.dispose();
+    messageController.dispose();
+    super.dispose();
+  }
+
+  void _startAlertTimer() {
+    _alertTimer = Timer(const Duration(), () {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -146,14 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     });
-  }
-
-  @override
-  void dispose() {
-    recipientsController.dispose();
-    senderNameController.dispose();
-    messageController.dispose();
-    super.dispose();
   }
 
   // Initial Selected Value
