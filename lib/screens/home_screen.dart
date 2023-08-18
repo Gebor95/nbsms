@@ -28,6 +28,22 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController senderNameController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
+    _startAlertTimer();
+  }
+
+  @override
+  void dispose() {
+    _alertTimer?.cancel(); // Cancel the timer if it's active
+    recipientsController.dispose();
+    senderNameController.dispose();
+    messageController.dispose();
+    super.dispose();
+  }
+
   Future<void> _sendMessage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
@@ -53,8 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           balance = '$newBalance';
         });
-
-        // Update balance in SharedPreferences or wherever needed
 
         showDialog(
           context: context,
@@ -124,37 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Future<void> _fetchBalance() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
-
-  //   String fetchedBalance = await fetchBalance(
-  //       username, password); // Call the method from api_service.dart
-  //   setState(() {
-  //     balance =
-  //         fetchedBalance; // Update the balance variable with the fetched value
-  //   });
-  // }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchBalance();
-    _startAlertTimer();
-  }
-
-  @override
-  void dispose() {
-    _alertTimer?.cancel(); // Cancel the timer if it's active
-    recipientsController.dispose();
-    senderNameController.dispose();
-    messageController.dispose();
-    super.dispose();
-  }
-
   void _startAlertTimer() {
-    _alertTimer = Timer(const Duration(), () {
+    _alertTimer = Timer(const Duration(seconds: 1), () {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
