@@ -7,7 +7,7 @@ import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'dart:async';
 
 import 'package:nbsms/navigators/goto_helper.dart';
-import 'package:nbsms/screens/login_screen.dart';
+import 'package:nbsms/screens/entry.dart';
 import 'package:nbsms/screens/onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final prefs = await SharedPreferences.getInstance();
       final showOnBoarding = prefs.getBool('showOnBoarding');
       if (showOnBoarding == true) {
-        goToReplace(context, const LoginScreen());
+        goToReplace(context, const AppEntryPoint());
       } else {
         goToReplace(context, const OnboardingScreen());
       }
