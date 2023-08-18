@@ -21,23 +21,39 @@ Future<String> fetchBalance(String username, String password) async {
   }
 }
 
-Future<String> fetchProfile(String username, String password) async {
-  var data = {
-    "username": username,
-    "password": password,
-    "action": "profile", // Use a different action to fetch the balance
+Future<Map<String, dynamic>> sendMessage(
+  String username,
+  String password,
+  String recipients,
+  String senderName,
+  String message,
+) async {
+  const apiUrl = 'https://portal.fastsmsnigeria.com/api/';
+
+  final queryParams = {
+    'username': username,
+    'password': password,
+    'message': message,
+    'sender': senderName,
+    'mobiles': recipients,
   };
 
-  final response = await http
-      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+  final response = await http.post(Uri.parse(apiUrl), body: queryParams);
 
   if (response.statusCode == 200) {
-    var responseData = jsonDecode(response.body);
-    print(responseData);
-    return responseData['profile'].toString();
+    final responseBody = response.body;
+    return parseApiResponse(responseBody);
   } else {
-    return "Error fetching profile";
+    throw Exception('Failed to send message');
   }
+}
+
+Map<String, dynamic> parseApiResponse(String responseBody) {
+  final parsed = jsonDecode(responseBody);
+  final status = parsed['status'];
+  final count = parsed['count'];
+  final price = parsed['price'];
+  return {'status': status, 'count': count, 'price': price};
 }
 
 Future<List<Map<String, dynamic>>> fetchReports(
@@ -106,7 +122,7 @@ Future<List<Map<String, dynamic>>> fetchPayment(
   }
 }
 
-Future<List<Contact>> fetchContacts(String username, String password) async {
+Future<List<Contactt>> fetchContacts(String username, String password) async {
   var data = {
     "username": username,
     "password": password,
@@ -118,23 +134,23 @@ Future<List<Contact>> fetchContacts(String username, String password) async {
 
   if (response.statusCode == 200) {
     var responseData = jsonDecode(response.body);
-    List<Contact> contacts = List<Contact>.from(
-        responseData.map((contactJson) => Contact.fromJson(contactJson)));
+    List<Contactt> contacts = List<Contactt>.from(
+        responseData.map((contactJson) => Contactt.fromJson(contactJson)));
     return contacts;
   } else {
     throw Exception("Failed to fetch contacts.");
   }
 }
 
-class Contact {
+class Contactt {
   //int id;
   String name;
   String mobile;
 
-  Contact({required this.name, required this.mobile});
+  Contactt({required this.name, required this.mobile});
 
-  factory Contact.fromJson(Map<String, dynamic> json) {
-    return Contact(
+  factory Contactt.fromJson(Map<String, dynamic> json) {
+    return Contactt(
       // id: json['id'],
       name: json['name'],
       mobile: json['mobile'],

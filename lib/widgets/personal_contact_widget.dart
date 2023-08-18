@@ -23,14 +23,14 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
     fetchAndPrintContacts();
   }
 
-  Future<List<Contact>> fetchAndPrintContacts() async {
+  Future<List<Contactt>> fetchAndPrintContacts() async {
     // Update the return type to Future<List<Contact>>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
     try {
-      List<Contact> fetchedContacts = await fetchContacts(username, password);
+      List<Contactt> fetchedContacts = await fetchContacts(username, password);
       return fetchedContacts;
     } catch (e) {
       print("Error fetching contacts: $e");
@@ -42,7 +42,7 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
   Widget build(BuildContext context) {
     return Container(
       clipBehavior: Clip.none,
-      child: FutureBuilder<List<Contact>>(
+      child: FutureBuilder<List<Contactt>>(
         future: fetchAndPrintContacts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

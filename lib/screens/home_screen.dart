@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -23,6 +23,89 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String balance = " Loading";
+  final TextEditingController recipientsController = TextEditingController();
+  final TextEditingController senderNameController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
+  Future<void> _sendMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    String recipients = recipientsController.text;
+    String senderName = senderNameController.text;
+    String message = messageController.text;
+
+    try {
+      final response = await sendMessage(
+          username, password, recipients, senderName, message);
+
+      final status = response['status'];
+      final count = response['count'];
+      final price = response['price'];
+
+      if (status == 'OK') {
+        double messageCost = double.parse(price.toString());
+        double currentBalance = double.parse(balance.replaceAll('₦', ''));
+        double newBalance = currentBalance - messageCost;
+
+        setState(() {
+          balance = '$newBalance';
+        });
+
+        // Update balance in SharedPreferences or wherever needed
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Message Sent'),
+            content: Text(
+                'Status: $status\nCount: $count\nPrice: $price\nBalance Deducted: ₦$messageCost'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Message sending failed.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('An error occurred while sending the message.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -65,6 +148,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    recipientsController.dispose();
+    senderNameController.dispose();
+    messageController.dispose();
+    super.dispose();
+  }
+
   // Initial Selected Value
   String dropdownvalue = 'New Contacts';
 
@@ -74,6 +165,23 @@ class _HomeScreenState extends State<HomeScreen> {
     'Personal Contacts',
     'Device Contacts',
   ];
+
+  Future<void> _pickDeviceContacts() async {
+    try {
+      final Iterable<Contact> contacts = await ContactsService.getContacts();
+
+      final List<String> phoneNumbers = contacts
+          .where((contact) => contact.phones?.isNotEmpty == true)
+          .map((contact) => contact.phones!.first.value!)
+          .toList();
+
+      setState(() {
+        recipientsController.text = phoneNumbers.join(' ');
+      });
+    } catch (e) {
+      print('Error picking device contacts: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,6 +277,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() {
                     dropdownvalue = newValue!;
                   });
+                  if (newValue == 'Device Contacts') {
+                    _pickDeviceContacts();
+                  }
                 },
                 decoration: const InputDecoration(
                   alignLabelWithHint: true,
@@ -183,6 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: screenHeight(context) * 0.02,
               ),
               TextFormField(
+                controller: recipientsController,
                 maxLines: 3,
                 decoration: const InputDecoration(
                   hintText: "Seperate each phone number with a space",
@@ -197,6 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: screenHeight(context) * 0.04,
               ),
               TextFormField(
+                controller: senderNameController,
                 decoration: const InputDecoration(
                   hintText: "OSPIVV",
                   border: OutlineInputBorder(
@@ -210,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: screenHeight(context) * 0.04,
               ),
               TextFormField(
+                controller: messageController,
                 maxLines: 5,
                 decoration: const InputDecoration(
                   hintText: "Message",
@@ -224,9 +338,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: screenHeight(context) * 0.04,
               ),
               SubmitButton(
-                onTap: () {
-                  goToReplace(context, const HomeScreen());
-                },
+                onTap: _sendMessage,
+                // String recipients = ...; // Get recipients from TextFormField
+                // String senderName = ...; // Get sender name from TextFormField
+                // String message = ...;    // Get message from TextFormField
+
+                // _sendMessage(recipients, senderName, message);
+
+                // goToReplace(context, const HomeScreen());
+
                 text: 'Send Message',
                 bgcolor: nbPrimarycolor,
                 fgcolor: nbSecondarycolor,
