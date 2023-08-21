@@ -97,13 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: const Icon(Icons.arrow_back_ios),
         ),
         title: const Text("Profile"),
-        // actions: const [
-        //   Icon(Icons.star_outline),
-        //   SizedBox(
-        //     width: 10,
-        //   ),
-        //   Icon(Icons.more_vert),
-        // ],
       ),
       body: SingleChildScrollView(
         child: Column(children: [

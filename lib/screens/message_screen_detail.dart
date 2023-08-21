@@ -1,7 +1,7 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:nbsms/api/api_service.dart';
+
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -24,16 +24,12 @@ class PersonalContScreen extends StatefulWidget {
 class _PersonalContScreenState extends State<PersonalContScreen> {
   String balance = " Loading";
   bool noMessage = false;
-  Future<void> _fetchBalance() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
 
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
+  Future<void> _loadSavedBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String savedBalance = prefs.getString('balance') ?? " Loading";
     setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
+      balance = savedBalance;
     });
   }
 
@@ -41,7 +37,7 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    _loadSavedBalance();
   }
 
   @override

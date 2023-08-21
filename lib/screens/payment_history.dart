@@ -28,41 +28,18 @@ class _PaymentHistoryState extends State<PaymentHistory> {
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    _loadSavedBalance();
     fetchPaymentHistory(selectedStatus);
   }
 
-  Future<void> _fetchBalance() async {
+  Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
+    String savedBalance = prefs.getString('balance') ?? " Loading";
     setState(() {
-      balance = fetchedBalance;
-      // Update the balance variable with the fetched value
+      balance = savedBalance;
     });
   }
 
-  // Future<void> fetchPaymentHistory() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
-
-  //   try {
-  //     List<Map<String, dynamic>> fetchedPayment =
-  //         await fetchPayment(username, password);
-  //     setState(() {
-  //       history = fetchedPayment;
-  //       paymentFetched = true;
-  //       // Filter the reports based on selected status
-  //     });
-  //   } catch (e) {
-  //     print("Error fetching reports: $e");
-  //     // Handle the error as needed
-  //   }
-  // }
   Future<void> fetchPaymentHistory(String selectedStatus) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
