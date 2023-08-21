@@ -65,17 +65,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
-    Map<String, dynamic>? fetchedProfile = await fetchProfile(
-        username, password); // Call the method from api_service.dart
-    if (fetchedProfile != null) {
+    // Try to fetch the saved profile from SharedPreferences
+    String? savedProfileJson = prefs.getString('profile');
+    if (savedProfileJson != null) {
+      Map<String, dynamic> savedProfile = jsonDecode(savedProfileJson);
       setState(() {
-        name = fetchedProfile['name'];
-        email = fetchedProfile['email'];
-        mobile = fetchedProfile['mobile'];
-        sender = fetchedProfile['sender'];
+        name = savedProfile['name'];
+        email = savedProfile['email'];
+        mobile = savedProfile['mobile'];
+        sender = savedProfile['sender'];
       });
     } else {
-      print("Error fetching profile");
+      // If not saved, fetch profile from API
+      Map<String, dynamic>? fetchedProfile =
+          await fetchProfile(username, password);
+      if (fetchedProfile != null) {
+        setState(() {
+          name = fetchedProfile['name'];
+          email = fetchedProfile['email'];
+          mobile = fetchedProfile['mobile'];
+          sender = fetchedProfile['sender'];
+        });
+        // Save the fetched profile in SharedPreferences
+        prefs.setString('profile', jsonEncode(fetchedProfile));
+      } else {
+        print("Error fetching profile");
+      }
     }
   }
 
