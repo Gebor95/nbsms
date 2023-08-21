@@ -1,5 +1,6 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 Future<String> fetchBalance(String username, String password) async {
   var data = {
@@ -19,6 +20,24 @@ Future<String> fetchBalance(String username, String password) async {
   }
 }
 
+Future<String> fetchPaymentHistory(String username, String password) async {
+  var data = {
+    "username": username,
+    "password": password,
+    "action": "payments",
+  };
+
+  final response = await http
+      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+
+  if (response.statusCode == 200) {
+    var responseData = jsonDecode(response.body);
+    return responseData['payments'].toString();
+  } else {
+    return "Error fetching payment history";
+  }
+}
+
 Future<String> fetchProfile(String username, String password) async {
   var data = {
     "username": username,
@@ -31,6 +50,7 @@ Future<String> fetchProfile(String username, String password) async {
 
   if (response.statusCode == 200) {
     var responseData = jsonDecode(response.body);
+    // ignore: avoid_print
     print(responseData);
     return responseData['profile'].toString();
   } else {
