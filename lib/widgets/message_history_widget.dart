@@ -45,21 +45,15 @@ class _MessageWidgetState extends State<MessageWidget> {
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    _loadSavedBalance();
     fetchAndDisplayReports();
   }
 
-  Future<void> _fetchBalance() async {
+  Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
+    String savedBalance = prefs.getString('balance') ?? " Loading";
     setState(() {
-      balance = fetchedBalance;
-      reportsFetched =
-          true; // Update the balance variable with the fetched value
+      balance = savedBalance;
     });
   }
 

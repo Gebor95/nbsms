@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:nbsms/api/api_service.dart';
+
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -23,16 +23,11 @@ class SendMessage extends StatefulWidget {
 
 class _SendMessageState extends State<SendMessage> {
   String balance = ' Loading';
-  Future<void> _fetchBalance() async {
+  Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
+    String savedBalance = prefs.getString('balance') ?? " Loading";
     setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
+      balance = savedBalance;
     });
   }
 
@@ -40,7 +35,7 @@ class _SendMessageState extends State<SendMessage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _fetchBalance();
+    _loadSavedBalance();
   }
 
   // Initial Selected Value
