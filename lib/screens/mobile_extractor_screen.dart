@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -8,10 +7,11 @@ import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/body_singlescroll_widget.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/drawer_widget.dart';
 
 class MobileExScreen extends StatefulWidget {
   const MobileExScreen({super.key});
@@ -27,23 +27,20 @@ class _MobileExScreenState extends State<MobileExScreen> {
   }
 
   String balance = " Loading";
-  Future<void> _fetchBalance() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
-    setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    // _fetchBalance();
+    _loadSavedBalance();
+  }
+
+  Future<void> _loadSavedBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String savedBalance = prefs.getString('balance') ?? " Loading";
+    setState(() {
+      balance = savedBalance;
+    });
   }
 
   @override
@@ -115,7 +112,7 @@ class _MobileExScreenState extends State<MobileExScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Mobile Extractor",

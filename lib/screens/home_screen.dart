@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -8,10 +8,12 @@ import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
+import 'package:nbsms/widgets/personal_contact_dropdown_widget.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/drawer_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,73 +23,204 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // String? _name;
+  // String? _email;
+
   String balance = " Loading";
+  bool hasShownAlert =
+      false; // Variable to track whether the alert has been shown
+  Contactt? selectedContact;
+  List<Contactt> personalContacts = [];
+  List<Contactt> selectedContacts = [];
+  Timer? _alertTimer;
+  final TextEditingController recipientsController = TextEditingController();
+  final TextEditingController senderNameController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBalance();
+    _startAlertTimer();
+    // _fetchNameAndEmail();
+    _loadSavedBalance();
+    _loadPersonalContacts();
+  }
+
+  Future<void> _loadPersonalContacts() async {
+    List<Contactt> contacts = await fetchAndPrintContacts();
+
+    if (mounted) {
+      // Check if the widget is still mounted
+      setState(() {
+        personalContacts = contacts;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _alertTimer?.cancel();
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('hasShownAlert', false);
+    }); // Cancel the timer if it's active
+    recipientsController.dispose();
+    senderNameController.dispose();
+    messageController.dispose();
+    super.dispose();
+  }
+
+  Future<List<Contactt>> fetchAndPrintContacts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    try {
+      List<Contactt> fetchedContacts = await fetchContacts(username, password);
+      return fetchedContacts;
+    } catch (e) {
+      print("Error fetching contacts: $e");
+      return []; // Return an empty list in case of an error
+    }
+  }
+
+  Future<void> _loadSavedBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String savedBalance = prefs.getString('balance') ?? " Loading";
+    setState(() {
+      balance = savedBalance;
+    });
+  }
+
+  Future<void> _sendMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    String recipients = recipientsController.text;
+    String senderName = senderNameController.text;
+    String message = messageController.text;
+
+    try {
+      final response = await sendMessage(
+          username, password, recipients, senderName, message);
+
+      final status = response['status'];
+      final count = response['count'];
+      final price = response['price'];
+
+      if (status == 'OK') {
+        double messageCost = double.parse(price.toString());
+        double currentBalance = double.parse(balance.replaceAll('₦', ''));
+        double newBalance = currentBalance - messageCost;
+
+        setState(() {
+          balance = '$newBalance';
+        });
+        recipientsController.clear();
+        senderNameController.clear();
+        messageController.clear();
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Message Sent'),
+            content: Text('Status: $status\nCount: $count\nPrice: $price'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Message sending failed.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('An error occurred while sending the message.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
-    setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
-    });
+    String fetchedBalance = await fetchBalance(username, password);
+
+    prefs.setString('balance', fetchedBalance); // Save the fetched balance
+
+    if (mounted) {
+      setState(() {
+        balance = fetchedBalance;
+      });
+    }
   }
-  // Future<void> _fetchBalance() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
 
-  //   var data = {
-  //     "username": username,
-  //     "password": password,
-  //     "action": "balance", // Use a different action to fetch the balance
-  //   };
+  void _startAlertTimer() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasShownAlert = prefs.getBool('hasShownAlert') ?? false;
 
-  //   final response = await http
-  //       .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
-
-  //   if (response.statusCode == 200) {
-  //     var responseData = jsonDecode(response.body);
-  //     setState(() {
-  //       balance = responseData['balance'].toString();
-  //     });
-  //   } else {
-  //     // Handle API call failure
-  //     setState(() {
-  //       balance = "Error fetching balance";
-  //     });
-  //   }
-  // }
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchBalance();
-    Timer(const Duration(), () {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          scrollable: true,
-          title: Text(
-            'Dear valued customer',
-            style: TextStyle(fontSize: 17.0, fontWeight: fnt600),
+    if (!hasShownAlert) {
+      _alertTimer = Timer(const Duration(seconds: 1), () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            scrollable: true,
+            title: const Text(
+              'Dear valued customer',
+              style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              'Please TEST your message to one or two numbers before sending it to BULK numbers. This is important because network providers have the explicit right to block any content or sender at their discretion without refund.\r\n\r\nPlease note that this does not affect API users who are sending pre-approved transactional messages.\r\n\r\nHowever, if you are having a delivery issue with your message, contact us and we shall be more than happy to assist.\r\n\r\nThank you so much for your kind patronage and understanding.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    hasShownAlert = true;
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Ok'),
+              ),
+            ],
           ),
-          content: const Text(
-              'Please TEST your message to one or two numbers before sending it to BULK numbers. This is important because network providers have the explicit right to block any content or sender at their discretion without refund.\r\n\r\nPlease note that this does not affect API users who are sending pre-approved transactional messages.\r\n\r\nHowever, if you are having a delivery issue with your message, contact us and we shall be more than happy to assist.\r\n\r\nThank you so much for your kind patronage and understanding.'),
-          actions: [
-            TextButton(
-                style: TextButton.styleFrom(
-                    foregroundColor: nbSecondarycolor,
-                    backgroundColor: nbPrimarycolor),
-                onPressed: () => goToPop(context),
-                child: const Text("Ok")),
-          ],
-        ),
-      );
-    });
+        );
+        prefs.setBool('hasShownAlert', true);
+      });
+    }
   }
 
   // Initial Selected Value
@@ -169,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: SingleChildScrollView(
@@ -193,7 +326,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 onChanged: (String? newValue) {
                   setState(() {
                     dropdownvalue = newValue!;
+                    if (newValue == 'Personal Contacts') {
+                      selectedContact = null;
+                    }
                   });
+                  if (newValue == 'Device Contacts') {
+                    // _pickDeviceContacts();
+                  } else {
+                    recipientsController.clear();
+                  }
                 },
                 decoration: const InputDecoration(
                   alignLabelWithHint: true,
@@ -204,24 +345,46 @@ class _HomeScreenState extends State<HomeScreen> {
                   labelText: "Select Contact",
                 ),
               ),
-              SizedBox(
-                height: screenHeight(context) * 0.02,
-              ),
+              if (dropdownvalue == 'New Contacts')
+                SizedBox(
+                  height: screenHeight(context) * 0.03,
+                ),
+              if (dropdownvalue == 'Device Contacts')
+                SizedBox(
+                  height: screenHeight(context) * 0.03,
+                ),
+              if (dropdownvalue == 'Personal Contacts')
+                PersonalContactsDropdown(
+                    personalContacts: personalContacts,
+                    selectedContacts: selectedContacts,
+                    onChanged: (List<Contactt> newSelectedContacts) {
+                      setState(() {
+                        selectedContacts = newSelectedContacts;
+                      });
+                      final mobileNumbers = selectedContacts
+                          .map((contact) => contact.mobile)
+                          .join(' ');
+                      recipientsController.text = mobileNumbers;
+                    }),
               TextFormField(
+                controller: recipientsController,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  hintText: "Seperate each phone number with a space",
+                  hintText: "Separate each phone number with a space",
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      width: 1,
+                      color: Colors.greenAccent,
+                    ),
                   ),
-                  label: Text("Recipients"),
+                  labelText: "Recipients",
                 ),
               ),
               SizedBox(
                 height: screenHeight(context) * 0.04,
               ),
               TextFormField(
+                controller: senderNameController,
                 decoration: const InputDecoration(
                   hintText: "OSPIVV",
                   border: OutlineInputBorder(
@@ -235,6 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: screenHeight(context) * 0.04,
               ),
               TextFormField(
+                controller: messageController,
                 maxLines: 5,
                 decoration: const InputDecoration(
                   hintText: "Message",
@@ -249,9 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: screenHeight(context) * 0.04,
               ),
               SubmitButton(
-                onTap: () {
-                  goToReplace(context, const HomeScreen());
-                },
+                onTap: _sendMessage,
                 text: 'Send Message',
                 bgcolor: nbPrimarycolor,
                 fgcolor: nbSecondarycolor,

@@ -1,14 +1,15 @@
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:nbsms/api/api_service.dart';
+import 'package:gap/gap.dart';
+
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
-import 'package:nbsms/widgets/body_colum_widget.dart';
-import 'package:nbsms/widgets/page_title.dart';
-import 'package:nbsms/widgets/personal_contact_widget.dart';
+import 'package:nbsms/widgets/message_history_widget.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/drawer_widget.dart';
@@ -22,24 +23,21 @@ class PersonalContScreen extends StatefulWidget {
 
 class _PersonalContScreenState extends State<PersonalContScreen> {
   String balance = " Loading";
-  bool nocontact = false;
-  Future<void> _fetchBalance() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
+  bool noMessage = false;
 
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
+  Future<void> _loadSavedBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String savedBalance = prefs.getString('balance') ?? " Loading";
     setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
+      balance = savedBalance;
     });
   }
 
+  final smsCatCtrl = TextEditingController();
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    _loadSavedBalance();
   }
 
   @override
@@ -112,11 +110,60 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
         ],
       ),
       drawer: const DrawerWidget(),
-      body: BodyColWidget(
+      body: Column(
         children: [
-          const PageTitle(text: "Personal Contacts"),
-          SizedBox(height: screenHeight(context) * 0.03),
-          nocontact
+          Row(
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Gap(10),
+                  Text(
+                    '   Messages',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(top: 18, right: 20),
+                child: Container(
+                  clipBehavior: Clip.none,
+                  width: 170,
+                  height: 50,
+                  child: CustomDropdown(
+                    fieldSuffixIcon: const Icon(
+                      Icons.arrow_drop_down_sharp,
+                      size: 25,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Colors.black12),
+                    selectedStyle: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400),
+                    hintText: 'Delivered',
+                    hintStyle: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400),
+                    items: const [
+                      'Delivered',
+                      'Submitted',
+                      'DND',
+                      'Failed',
+                    ],
+                    controller: smsCatCtrl,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Gap(20),
+          noMessage
               ? Container(
                   clipBehavior: Clip.none,
                   child: Column(
@@ -150,8 +197,9 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
                   ),
                 )
               : const Expanded(
-                  child: PersonalContWidget(),
+                  child: MessageWidget(),
                 )
+          //
         ],
       ),
     );

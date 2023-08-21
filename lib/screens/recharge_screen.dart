@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -7,10 +6,11 @@ import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/widgets/body_singlescroll_widget.dart';
-import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/drawer_widget.dart';
 
 class RechargeScreen extends StatefulWidget {
   const RechargeScreen({super.key});
@@ -21,23 +21,18 @@ class RechargeScreen extends StatefulWidget {
 
 class _RechargeScreenState extends State<RechargeScreen> {
   String balance = " Loading";
-  Future<void> _fetchBalance() async {
+  Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
+    String savedBalance = prefs.getString('balance') ?? " Loading";
     setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
+      balance = savedBalance;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    _loadSavedBalance();
   }
 
   @override
@@ -109,7 +104,7 @@ class _RechargeScreenState extends State<RechargeScreen> {
               ))
         ],
       ),
-      drawer: const DrawerWidgt(),
+      drawer: const DrawerWidget(),
       body: BodyPaddingWidget(children: [
         const PageTitle(
           text: "Recharge Account",

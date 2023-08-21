@@ -1,40 +1,41 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:nbsms/constant/constant_colors.dart';
+import 'package:nbsms/model/user.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/login_screen.dart';
 import 'package:nbsms/screens/mobile_extractor_screen.dart';
+import 'package:nbsms/screens/payment_history.dart';
 import 'package:nbsms/screens/personal_contact_screen.dart';
 import 'package:nbsms/screens/profile_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
+import 'package:nbsms/widgets/message_history_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
-class DrawerWidgt extends StatefulWidget {
-  const DrawerWidgt({super.key});
+class DrawerWidget extends StatefulWidget {
+  const DrawerWidget({super.key});
 
   @override
-  State<DrawerWidgt> createState() => _DrawerWidgtState();
+  State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
-class _DrawerWidgtState extends State<DrawerWidgt> {
+class _DrawerWidgetState extends State<DrawerWidget> {
   String? name = '';
   String? email = '';
-  Future<void>? _fetchProfileFuture;
 
   @override
   void initState() {
     super.initState();
-    _fetchProfileFuture = _fetchProfile();
+    _fetchProfile();
   }
 
   @override
   void dispose() {
-    // Cancel the asynchronous operation when the widget is disposed.
-    _fetchProfileFuture?.whenComplete(() {});
     super.dispose();
   }
 
@@ -70,23 +71,23 @@ class _DrawerWidgtState extends State<DrawerWidgt> {
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
-    Map<String, dynamic>? fetchedProfile = await fetchProfile(
-        username, password); // Call the method from api_service.dart
-    if (fetchedProfile != null) {
-      if (mounted) {
-        setState(() {
-          name = fetchedProfile['name'];
-          email = fetchedProfile['email'];
-        });
+    try {
+      final response = await fetchProfile(username, password);
+
+      if (response != null) {
+        Provider.of<UserProfileProvider>(context, listen: false)
+            .setProfile(response['name'], response['email']);
+      } else {
+        // Handle error
       }
-    } else {
-      print("Error fetching profile");
+    } catch (e) {
+      // Handle exceptions, such as network errors
     }
-    const Text('Loading....');
   }
 
   @override
   Widget build(BuildContext context) {
+    final userProfile = Provider.of<UserProfileProvider>(context);
     return Drawer(
       child: ListView(
         padding: const EdgeInsets.all(0),
@@ -98,11 +99,11 @@ class _DrawerWidgtState extends State<DrawerWidgt> {
             child: UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: nbPrimarydarker),
               accountName: Text(
-                name!,
+                userProfile.name ?? '',
                 style: const TextStyle(fontSize: 18),
               ),
               accountEmail: Text(
-                email!,
+                userProfile.email ?? '',
               ),
             ), //UserAccountDrawerHeader
           ), //DrawerHeader
@@ -158,13 +159,13 @@ class _DrawerWidgtState extends State<DrawerWidgt> {
               ListTile(
                 title: const Text("Messages"),
                 onTap: () {
-                  //action on press
+                  goToPush(context, const MessageWidget());
                 },
               ),
               ListTile(
                 title: const Text("Payments"),
                 onTap: () {
-                  //action on press
+                  goToPush(context, const PaymentHistory());
                 },
               ),
             ],

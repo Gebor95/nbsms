@@ -13,24 +13,26 @@ class PersonalContWidget extends StatefulWidget {
   State<PersonalContWidget> createState() => _PersonalContWidgetState();
 }
 
+//typedef ContactSelectCallback = void Function(Contactt contact);
+
 class _PersonalContWidgetState extends State<PersonalContWidget> {
-  List<Map<String, dynamic>> contacts = [];
+  //ContactSelectCallback? contactSelectCallback;
 
   @override
   void initState() {
     super.initState();
-    //fetchContact();
-    fetchAndPrintContacts();
+    // contactSelectCallback = (contact) {
+    //   setState(() {});
+    // };
   }
 
-  Future<List<Contact>> fetchAndPrintContacts() async {
-    // Update the return type to Future<List<Contact>>
+  Future<List<Contactt>> fetchAndPrintContacts() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
     try {
-      List<Contact> fetchedContacts = await fetchContacts(username, password);
+      List<Contactt> fetchedContacts = await fetchContacts(username, password);
       return fetchedContacts;
     } catch (e) {
       print("Error fetching contacts: $e");
@@ -42,43 +44,41 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
   Widget build(BuildContext context) {
     return Container(
       clipBehavior: Clip.none,
-      child: FutureBuilder<List<Contact>>(
+      child: FutureBuilder<List<Contactt>>(
         future: fetchAndPrintContacts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            final contacts = snapshot.data;
-            if (contacts!.isEmpty) {
+            final contacts = snapshot.data!;
+            if (contacts.isEmpty) {
               return Container(
                 clipBehavior: Clip.none,
                 child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: screenHeight(context) * 0.10,
-                    ),
+                    SizedBox(height: screenHeight(context) * 0.10),
                     Container(
                       alignment: Alignment.center,
                       width: screenWidth(context) * 0.60,
                       height: screenWidth(context) * 0.60,
                       decoration: BoxDecoration(
                         color: nbPrimarycolor,
-                        //shape: BoxShape.circle,
                       ),
                       child: Image.asset(
                         'assets/images/messages.jpg',
                         scale: 0.5,
                       ),
                     ),
-                    SizedBox(
-                      height: screenHeight(context) * 0.03,
-                    ),
+                    SizedBox(height: screenHeight(context) * 0.03),
                     const Center(
-                        child: Text(" No Saved Contact Yet!",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 25))),
+                      child: Text(
+                        "No Saved Contact Yet!",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -87,34 +87,25 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
                 itemCount: contacts.length,
                 itemBuilder: (context, index) {
                   final contact = contacts[index];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        // title: Text('Contact ID: ${contact.id}'),
-                        // contentPadding: EdgeInsets.symmetric(
-                        //     horizontal: screenWidth(context) * 0.01,
-                        //     vertical: screenHeight(context) * 0.01),
-                        leading: CircleAvatar(
-                          backgroundColor: nbPrimarycolor,
-                          child: Icon(
-                            Icons.person,
-                            color: nbSecondarycolor,
-                          ),
-                        ),
-                        title: Text(' ${contact.name}'),
-                        subtitle: Text(' ${contact.mobile}'),
-                        trailing: IconButton(
-                          onPressed: () {
-                            goToPush(context, const SendMessage());
-                          },
-                          icon: Icon(
-                            Icons.chat,
-                            color: nbPrimarycolor,
-                          ),
-                        ),
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: nbPrimarycolor,
+                      child: Icon(
+                        Icons.person,
+                        color: nbSecondarycolor,
                       ),
-                    ],
+                    ),
+                    title: Text(contact.name),
+                    subtitle: Text(contact.mobile),
+                    trailing: IconButton(
+                      onPressed: () {
+                        goToPush(context, const SendMessage());
+                      },
+                      icon: Icon(
+                        Icons.chat,
+                        color: nbPrimarycolor,
+                      ),
+                    ),
                   );
                 },
               );
@@ -126,39 +117,6 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
           return const Center(child: CircularProgressIndicator());
         },
       ),
-      // ListView.builder(
-      //   itemCount: contacts.length,
-      //   itemBuilder: (context, index) {
-      //     final contact = contacts[index];
-      //     return Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: [
-      //         ListTile(
-      //           contentPadding: EdgeInsets.symmetric(
-      //               horizontal: screenWidth(context) * 0.01,
-      //               vertical: screenHeight(context) * 0.01),
-      //           leading: CircleAvatar(
-      //             backgroundColor: nbPrimarycolor,
-      //             child: Icon(
-      //               Icons.person,
-      //               color: nbSecondarycolor,
-      //             ),
-      //           ),
-      //           title: Text(contact['name']),
-      //           subtitle: Text(contact['mobile']),
-      //           trailing: IconButton(
-      //               onPressed: () {
-      //                 goToPush(context, const SendMessage());
-      //               },
-      //               icon: Icon(
-      //                 Icons.chat,
-      //                 color: nbPrimarycolor,
-      //               )),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
 }

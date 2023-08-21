@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String? val = pref.getString("login");
     if (val == "logged_in") {
-      goToPush(context, const HomeScreen());
+      goToReplace(context, const HomeScreen());
     }
   }
 
@@ -56,12 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('username', emailController.text);
         prefs.setString('password', pwordController.text);
+        prefs.setString('userFullName', data['full_name']);
+        prefs.setString('userEmail', data['email']);
         pageRoute("logged_in");
-
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()));
-        // }
-        print(data['status']);
+        goToReplace(context, const HomeScreen());
       }
       if (data['error'] != "") {
         ScaffoldMessenger.of(context)
@@ -69,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print(data['error']);
       }
     } else {
+      const CircularProgressIndicator();
       print(response.body);
     }
   }
@@ -76,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void pageRoute(String status) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setString("login", status);
-    goToPush(context, const HomeScreen());
+    goToReplace(context, const HomeScreen());
   }
 
   @override
@@ -211,12 +210,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     SubmitButton(
                                       onTap: () {
-                                        // if (_formKey.currentState!.validate()) {
-                                        //   Provider.of<UserProvider>(context,
-                                        //           listen: false)
-                                        //       .loginusrrqt(context);
-                                        // }
-                                        loginusrrqt();
+                                        if (_formKey.currentState!.validate()) {
+                                          loginusrrqt();
+                                        }
                                       },
                                       text: 'Login',
                                       bgcolor: nbPrimarycolor,
