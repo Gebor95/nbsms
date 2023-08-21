@@ -14,14 +14,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/drawer_widget.dart';
 
-class PersonalContScreen extends StatefulWidget {
-  const PersonalContScreen({super.key});
+class MessageDetailsScreen extends StatefulWidget {
+  const MessageDetailsScreen({super.key});
 
   @override
-  State<PersonalContScreen> createState() => _PersonalContScreenState();
+  State<MessageDetailsScreen> createState() => _MessageDetailsScreenState();
 }
 
-class _PersonalContScreenState extends State<PersonalContScreen> {
+class _MessageDetailsScreenState extends State<MessageDetailsScreen> {
   String balance = " Loading";
   bool noMessage = false;
 
@@ -190,9 +190,7 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
                       SizedBox(
                         height: screenHeight(context) * 0.03,
                       ),
-                      const Center(
-                          child:
-                              Text("You have not saved a personal contact!")),
+                      const Center(child: Text("You Have No Message Yet!")),
                     ],
                   ),
                 )

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -23,9 +22,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // String? _name;
-  // String? _email;
-
   String balance = " Loading";
   bool hasShownAlert =
       false; // Variable to track whether the alert has been shown
@@ -40,9 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+
     _startAlertTimer();
-    // _fetchNameAndEmail();
     _loadSavedBalance();
     _loadPersonalContacts();
   }
@@ -169,22 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       );
-    }
-  }
-
-  Future<void> _fetchBalance() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(username, password);
-
-    prefs.setString('balance', fetchedBalance); // Save the fetched balance
-
-    if (mounted) {
-      setState(() {
-        balance = fetchedBalance;
-      });
     }
   }
 

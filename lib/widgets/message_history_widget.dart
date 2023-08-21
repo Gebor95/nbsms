@@ -67,8 +67,9 @@ class _MessageWidgetState extends State<MessageWidget> {
           await fetchReports(username, password);
       setState(() {
         reports = fetchedReports;
-        _filterReports(
-            selectedStatus); // Filter the reports based on selected status
+        filteredReports =
+            fetchedReports; // Initialize filteredReports with fetched data
+        reportsFetched = true; // Set reportsFetched to true
       });
     } catch (e) {
       print("Error fetching reports: $e");

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
+import 'package:nbsms/model/provider.dart';
 import 'package:nbsms/model/user.dart';
 import 'package:nbsms/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,7 @@ Future main() async {
       ChangeNotifierProvider<UserProfileProvider>(
         create: (_) => UserProfileProvider(),
       ),
+      ChangeNotifierProvider(create: (context) => SelectedContactsProvider()),
     ],
     child: MyApp(showOnBoarding: showOnBoarding),
   ));
