@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -127,31 +126,6 @@ class _SendMessageState extends State<SendMessage> {
               const PageTitle(
                 text: "Text Message",
               ),
-              // SizedBox(
-              //   height: screenHeight(context) * 0.06,
-              // ),
-              // DropdownButtonFormField(
-              //   value: dropdownvalue,
-              //   items: items.map((String items) {
-              //     return DropdownMenuItem(
-              //       value: items,
-              //       child: Text(items),
-              //     );
-              //   }).toList(),
-              //   onChanged: (String? newValue) {
-              //     setState(() {
-              //       dropdownvalue = newValue!;
-              //     });
-              //   },
-              //   decoration: const InputDecoration(
-              //     alignLabelWithHint: true,
-              //     border: OutlineInputBorder(
-              //       borderSide: BorderSide(
-              //           width: 1, color: Colors.greenAccent), //<-- SEE HERE
-              //     ),
-              //     labelText: "Select Contact",
-              //   ),
-              // ),
               SizedBox(
                 height: screenHeight(context) * 0.02,
               ),
