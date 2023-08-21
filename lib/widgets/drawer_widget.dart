@@ -27,18 +27,15 @@ class DrawerWidget extends StatefulWidget {
 class _DrawerWidgetState extends State<DrawerWidget> {
   String? name = '';
   String? email = '';
-  Future<void>? _fetchProfileFuture;
 
   @override
   void initState() {
     super.initState();
-    _fetchProfileFuture = _fetchProfile();
+    _fetchProfile();
   }
 
   @override
   void dispose() {
-    // Cancel the asynchronous operation when the widget is disposed.
-    _fetchProfileFuture?.whenComplete(() {});
     super.dispose();
   }
 
@@ -74,13 +71,17 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
 
-    Map<String, dynamic>? fetchedProfile = await fetchProfile(
-        username, password); // Call the method from api_service.dart
-    if (fetchedProfile != null) {
-      Provider.of<UserProfileProvider>(context, listen: false)
-          .setProfile(fetchedProfile['name'], fetchedProfile['email']);
-    } else {
-      // Handle error
+    try {
+      final response = await fetchProfile(username, password);
+
+      if (response != null) {
+        Provider.of<UserProfileProvider>(context, listen: false)
+            .setProfile(response['name'], response['email']);
+      } else {
+        // Handle error
+      }
+    } catch (e) {
+      // Handle exceptions, such as network errors
     }
   }
 
