@@ -22,7 +22,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String? _name;
+  String? _email;
   String balance = " Loading";
+  bool hasShownAlert =
+      false; // Variable to track whether the alert has been shown
+
   Timer? _alertTimer;
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
@@ -33,15 +38,25 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _fetchBalance();
     _startAlertTimer();
+    _fetchNameAndEmail();
   }
 
   @override
   void dispose() {
-    _alertTimer?.cancel(); // Cancel the timer if it's active
+    _alertTimer?.cancel();
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('hasShownAlert', false);
+    }); // Cancel the timer if it's active
     recipientsController.dispose();
     senderNameController.dispose();
     messageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchNameAndEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _name = prefs.getString('name');
+    _email = prefs.getString('email');
   }
 
   Future<void> _sendMessage() async {
@@ -69,6 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           balance = '$newBalance';
         });
+        recipientsController.clear();
+        senderNameController.clear();
+        messageController.clear();
 
         showDialog(
           context: context,
@@ -138,29 +156,39 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _startAlertTimer() {
-    _alertTimer = Timer(const Duration(seconds: 1), () {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          scrollable: true,
-          title: Text(
-            'Dear valued customer',
-            style: TextStyle(fontSize: 17.0, fontWeight: fnt600),
+  void _startAlertTimer() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool hasShownAlert = prefs.getBool('hasShownAlert') ?? false;
+
+    if (!hasShownAlert) {
+      _alertTimer = Timer(const Duration(seconds: 1), () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            scrollable: true,
+            title: const Text(
+              'Dear valued customer',
+              style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              'Please TEST your message to one or two numbers before sending it to BULK numbers. This is important because network providers have the explicit right to block any content or sender at their discretion without refund.\r\n\r\nPlease note that this does not affect API users who are sending pre-approved transactional messages.\r\n\r\nHowever, if you are having a delivery issue with your message, contact us and we shall be more than happy to assist.\r\n\r\nThank you so much for your kind patronage and understanding.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    hasShownAlert = true;
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Ok'),
+              ),
+            ],
           ),
-          content: const Text(
-              'Please TEST your message to one or two numbers before sending it to BULK numbers. This is important because network providers have the explicit right to block any content or sender at their discretion without refund.\r\n\r\nPlease note that this does not affect API users who are sending pre-approved transactional messages.\r\n\r\nHowever, if you are having a delivery issue with your message, contact us and we shall be more than happy to assist.\r\n\r\nThank you so much for your kind patronage and understanding.'),
-          actions: [
-            TextButton(
-                style: TextButton.styleFrom(
-                    foregroundColor: nbSecondarycolor,
-                    backgroundColor: nbPrimarycolor),
-                onPressed: () => goToPop(context),
-                child: const Text("Ok")),
-          ],
-        ),
-      );
-    });
+        );
+        prefs.setBool('hasShownAlert', true);
+      });
+    }
   }
 
   // Initial Selected Value
@@ -346,14 +374,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SubmitButton(
                 onTap: _sendMessage,
-                // String recipients = ...; // Get recipients from TextFormField
-                // String senderName = ...; // Get sender name from TextFormField
-                // String message = ...;    // Get message from TextFormField
-
-                // _sendMessage(recipients, senderName, message);
-
-                // goToReplace(context, const HomeScreen());
-
                 text: 'Send Message',
                 bgcolor: nbPrimarycolor,
                 fgcolor: nbSecondarycolor,

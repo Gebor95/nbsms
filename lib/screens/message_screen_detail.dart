@@ -203,56 +203,7 @@ class _PersonalContScreenState extends State<PersonalContScreen> {
               : const Expanded(
                   child: MessageWidget(),
                 )
-          // Expanded(Me
-          //   child: ListView.builder(
-          //     itemCount: reports.length,
-          //     itemBuilder: (context, index) {
-          //       Map<String, dynamic> reportData = reports[index];
-          //       Color statusColor = Colors.green;
-          //       if (reportData['status'] == 'FAILED') {
-          //         statusColor = Colors.red;
-          //       } else if (reportData['status'] == 'Submitted') {
-          //         statusColor = const Color.fromARGB(209, 201, 183, 27);
-          //       } else if (reportData['status'] == 'DND-ST/1') {
-          //         statusColor = Colors.grey;
-          //       }
-
-          //       return Padding(
-          //         padding: const EdgeInsets.all(8.0),
-          //         child: ListTile(
-          //             shape: OutlineInputBorder(
-          //                 borderRadius: BorderRadius.circular(20),
-          //                 borderSide:
-          //                     const BorderSide(color: Colors.black26)),
-          //             trailing: const Icon(
-          //               Icons.arrow_forward_ios,
-          //               size: 40,
-          //               color: Colors.black,
-          //             ),
-          //             subtitle: Column(
-          //               crossAxisAlignment: CrossAxisAlignment.start,
-          //               children: [
-          //                 Text(reportData['send_date']),
-          //                 Text(
-          //                   reportData['status'],
-          //                   style: TextStyle(
-          //                       color: statusColor,
-          //                       fontSize: 20,
-          //                       fontWeight: FontWeight.w600),
-          //                 ),
-          //                 Text(
-          //                   reportData['mobile'].toString(),
-          //                   style: const TextStyle(
-          //                       color: Colors.black,
-          //                       fontSize: 20,
-          //                       fontWeight: FontWeight.w600),
-          //                 ),
-          //               ],
-          //             )),
-          //       );
-          //     },
-          //   ),
-          // ),
+          //
         ],
       ),
     );
