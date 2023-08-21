@@ -56,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('username', emailController.text);
         prefs.setString('password', pwordController.text);
+        prefs.setString('userFullName', data['full_name']);
+        prefs.setString('userEmail', data['email']);
         pageRoute("logged_in");
         goToReplace(context, const HomeScreen());
       }
