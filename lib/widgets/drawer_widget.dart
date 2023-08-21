@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nbsms/constant/constant_colors.dart';
+import 'package:nbsms/model/user.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/screens/login_screen.dart';
@@ -13,6 +14,7 @@ import 'package:nbsms/screens/profile_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/screens/splash_screen.dart';
 import 'package:nbsms/widgets/message_history_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -75,19 +77,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     Map<String, dynamic>? fetchedProfile = await fetchProfile(
         username, password); // Call the method from api_service.dart
     if (fetchedProfile != null) {
-      if (mounted) {
-        setState(() {
-          name = fetchedProfile['name'];
-          email = fetchedProfile['email'];
-        });
-      }
+      Provider.of<UserProfileProvider>(context, listen: false)
+          .setProfile(fetchedProfile['name'], fetchedProfile['email']);
     } else {
-      // print("Error fetching profile");
+      // Handle error
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userProfile = Provider.of<UserProfileProvider>(context);
     return Drawer(
       child: ListView(
         padding: const EdgeInsets.all(0),
@@ -99,11 +98,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             child: UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: nbPrimarydarker),
               accountName: Text(
-                name!,
+                userProfile.name ?? '',
                 style: const TextStyle(fontSize: 18),
               ),
               accountEmail: Text(
-                email!,
+                userProfile.email ?? '',
               ),
             ), //UserAccountDrawerHeader
           ), //DrawerHeader

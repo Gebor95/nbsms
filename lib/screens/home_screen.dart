@@ -54,12 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // Future<void> _fetchNameAndEmail() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   _name = prefs.getString('name');
-  //   _email = prefs.getString('email');
-  // }
-
   Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String savedBalance = prefs.getString('balance') ?? " Loading";
@@ -147,22 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
-
-  // Future<void> _fetchBalance() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
-
-  //   String fetchedBalance = await fetchBalance(
-  //       username, password); // Call the method from api_service.dart
-  //   if (mounted) {
-  //     // Check if the widget is still mounted
-  //     setState(() {
-  //       balance =
-  //           fetchedBalance; // Update the balance variable with the fetched value
-  //     });
-  //   }
-  // }
 
   Future<void> _fetchBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
