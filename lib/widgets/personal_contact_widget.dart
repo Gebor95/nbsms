@@ -13,7 +13,19 @@ class PersonalContWidget extends StatefulWidget {
   State<PersonalContWidget> createState() => _PersonalContWidgetState();
 }
 
+//typedef ContactSelectCallback = void Function(Contactt contact);
+
 class _PersonalContWidgetState extends State<PersonalContWidget> {
+  //ContactSelectCallback? contactSelectCallback;
+
+  @override
+  void initState() {
+    super.initState();
+    // contactSelectCallback = (contact) {
+    //   setState(() {});
+    // };
+  }
+
   Future<List<Contactt>> fetchAndPrintContacts() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';

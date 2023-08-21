@@ -9,6 +9,7 @@ import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/page_title.dart';
+import 'package:nbsms/widgets/personal_contact_dropdown_widget.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,10 +25,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // String? _name;
   // String? _email;
+
   String balance = " Loading";
   bool hasShownAlert =
       false; // Variable to track whether the alert has been shown
-
+  Contactt? selectedContact;
+  List<Contactt> personalContacts = [];
+  List<Contactt> selectedContacts = [];
   Timer? _alertTimer;
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
@@ -40,6 +44,18 @@ class _HomeScreenState extends State<HomeScreen> {
     _startAlertTimer();
     // _fetchNameAndEmail();
     _loadSavedBalance();
+    _loadPersonalContacts();
+  }
+
+  Future<void> _loadPersonalContacts() async {
+    List<Contactt> contacts = await fetchAndPrintContacts();
+
+    if (mounted) {
+      // Check if the widget is still mounted
+      setState(() {
+        personalContacts = contacts;
+      });
+    }
   }
 
   @override
@@ -52,6 +68,20 @@ class _HomeScreenState extends State<HomeScreen> {
     senderNameController.dispose();
     messageController.dispose();
     super.dispose();
+  }
+
+  Future<List<Contactt>> fetchAndPrintContacts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    try {
+      List<Contactt> fetchedContacts = await fetchContacts(username, password);
+      return fetchedContacts;
+    } catch (e) {
+      print("Error fetching contacts: $e");
+      return []; // Return an empty list in case of an error
+    }
   }
 
   Future<void> _loadSavedBalance() async {
@@ -203,23 +233,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'Device Contacts',
   ];
 
-  Future<void> _pickDeviceContacts() async {
-    try {
-      final Iterable<Contact> contacts = await ContactsService.getContacts();
-
-      final List<String> phoneNumbers = contacts
-          .where((contact) => contact.phones?.isNotEmpty == true)
-          .map((contact) => contact.phones!.first.value!)
-          .toList();
-
-      setState(() {
-        recipientsController.text = phoneNumbers.join(' ');
-      });
-    } catch (e) {
-      print('Error picking device contacts: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -313,9 +326,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 onChanged: (String? newValue) {
                   setState(() {
                     dropdownvalue = newValue!;
+                    if (newValue == 'Personal Contacts') {
+                      selectedContact = null;
+                    }
                   });
                   if (newValue == 'Device Contacts') {
-                    _pickDeviceContacts();
+                    // _pickDeviceContacts();
+                  } else {
+                    recipientsController.clear();
                   }
                 },
                 decoration: const InputDecoration(
@@ -327,19 +345,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   labelText: "Select Contact",
                 ),
               ),
-              SizedBox(
-                height: screenHeight(context) * 0.02,
-              ),
+              if (dropdownvalue == 'New Contacts')
+                SizedBox(
+                  height: screenHeight(context) * 0.03,
+                ),
+              if (dropdownvalue == 'Device Contacts')
+                SizedBox(
+                  height: screenHeight(context) * 0.03,
+                ),
+              if (dropdownvalue == 'Personal Contacts')
+                PersonalContactsDropdown(
+                    personalContacts: personalContacts,
+                    selectedContacts: selectedContacts,
+                    onChanged: (List<Contactt> newSelectedContacts) {
+                      setState(() {
+                        selectedContacts = newSelectedContacts;
+                      });
+                      final mobileNumbers = selectedContacts
+                          .map((contact) => contact.mobile)
+                          .join(' ');
+                      recipientsController.text = mobileNumbers;
+                    }),
               TextFormField(
                 controller: recipientsController,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  hintText: "Seperate each phone number with a space",
+                  hintText: "Separate each phone number with a space",
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      width: 1,
+                      color: Colors.greenAccent,
+                    ),
                   ),
-                  label: Text("Recipients"),
+                  labelText: "Recipients",
                 ),
               ),
               SizedBox(
