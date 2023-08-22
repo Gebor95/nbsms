@@ -72,7 +72,9 @@ class _MessageDetailPersonalScreenState
             Icons.arrow_back,
             color: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            goToPop(context);
+          },
         ),
         actions: [
           IconButton(
@@ -117,53 +119,67 @@ class _MessageDetailPersonalScreenState
                     children: [
                       Text(widget.selectedStatus),
                       Text(
-                        'Sender: ${widget.messageDetails.sender}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Mobile: ${widget.phoneNumber}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Price:₦${widget.messageDetails.price}',
+                        'Sender:                 ${widget.messageDetails.sender}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Units: ${widget.messageDetails.units}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        'Mobile:                  ${widget.phoneNumber}',
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Length: ${widget.messageDetails.length}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        'Price:                     ₦${widget.messageDetails.price}',
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Send Date: ${widget.messageDetails.sendDate}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        'Units:                     ${widget.messageDetails.units}',
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Created Date: ${widget.messageDetails.sendDate}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        'Length:                  ${widget.messageDetails.length}',
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
+                      Text(
+                        'Send Date:             ${widget.messageDetails.sendDate}',
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Created Date:        ${widget.messageDetails.sendDate}',
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
                       Text(
                         'Message: ${widget.messageDetails.message}',
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontFamily: roboto,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
