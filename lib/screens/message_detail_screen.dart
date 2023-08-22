@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nbsms/constant/constant_colors.dart';
+import 'package:nbsms/constant/constant_fonts.dart';
 
 class MessageDetails {
   final String message;
@@ -53,19 +55,31 @@ class _MessageDetailPersonalScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.phoneNumber),
-        backgroundColor: Colors.green,
+        title: Text(
+          widget.phoneNumber,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: nbPrimarycolor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () {},
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_cart),
+            icon: const Icon(
+              Icons.shopping_cart,
+              color: Colors.white,
+            ),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(
+              Icons.notifications,
+              color: Colors.white,
+            ),
             onPressed: () {},
           ),
         ],
@@ -78,9 +92,7 @@ class _MessageDetailPersonalScreenState
           children: [
             const Text(
               'Message Details',
-              style: TextStyle(
-                fontSize: 24.0,
-              ),
+              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -94,9 +106,17 @@ class _MessageDetailPersonalScreenState
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Price:${widget.messageDetails.price}',
+                    'Mobile: ${widget.phoneNumber}',
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Price:₦${widget.messageDetails.price}',
+                    style: TextStyle(
+                        fontFamily: roboto,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -113,6 +133,12 @@ class _MessageDetailPersonalScreenState
                   const SizedBox(height: 10),
                   Text(
                     'Send Date: ${widget.messageDetails.sendDate}',
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Created Date: ${widget.messageDetails.sendDate}',
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),
