@@ -22,6 +22,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _passwordVisible = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController pwordController = TextEditingController();
@@ -180,13 +181,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: screenHeight(context) * 0.02,
                                     ),
                                     TextFormField(
-                                      // onChanged: (value) =>
-                                      //     loginModel.setPassword(value),
                                       controller: pwordController,
-                                      obscureText: true,
-                                      //obscuringCharacter: '',
-                                      decoration: const InputDecoration(
+                                      obscureText: !_passwordVisible,
+                                      decoration: InputDecoration(
                                         hintText: "Password",
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _passwordVisible
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _passwordVisible =
+                                                  !_passwordVisible;
+                                            });
+                                          },
+                                        ),
                                       ),
                                       validator: (value) {
                                         if (value!.isEmpty) {
