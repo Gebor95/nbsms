@@ -23,23 +23,20 @@ class PersonalContScreen extends StatefulWidget {
 class _PersonalContScreenState extends State<PersonalContScreen> {
   String balance = " Loading";
   bool nocontact = false;
-  Future<void> _fetchBalance() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(
-        username, password); // Call the method from api_service.dart
-    setState(() {
-      balance =
-          fetchedBalance; // Update the balance variable with the fetched value
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+    //_fetchBalance();
+    _loadSavedBalance();
+  }
+
+  Future<void> _loadSavedBalance() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String savedBalance = prefs.getString('balance') ?? " Loading";
+    setState(() {
+      balance = savedBalance;
+    });
   }
 
   @override

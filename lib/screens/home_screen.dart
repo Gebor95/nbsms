@@ -116,9 +116,14 @@ class _HomeScreenState extends State<HomeScreen> {
         double currentBalance = double.parse(balance.replaceAll('₦', ''));
         double newBalance = currentBalance - messageCost;
 
+        // Update the state to reflect the new balance
         setState(() {
           balance = '$newBalance';
         });
+
+        // Update the saved balance in SharedPreferences
+        prefs.setString('balance', '$newBalance');
+
         recipientsController.clear();
         senderNameController.clear();
         messageController.clear();
@@ -127,7 +132,10 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Message Sent'),
-            content: Text('Status: $status\nCount: $count\nPrice: $price'),
+            content: Text(
+              'Status: $status\nCount: $count\nPrice: ₦$price',
+              style: TextStyle(fontFamily: roboto),
+            ),
             actions: [
               TextButton(
                 onPressed: () {
@@ -355,19 +363,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: screenHeight(context) * 0.03,
                 ),
-              if (dropdownvalue == 'Personal Contacts')
-                PersonalContactsDropdown(
-                    personalContacts: personalContacts,
-                    selectedContacts: selectedContacts,
-                    onChanged: (List<Contactt> newSelectedContacts) {
-                      setState(() {
-                        selectedContacts = newSelectedContacts;
-                      });
-                      final mobileNumbers = selectedContacts
-                          .map((contact) => contact.mobile)
-                          .join(' ');
-                      recipientsController.text = mobileNumbers;
-                    }),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (dropdownvalue == 'Personal Contacts')
+                  personalContacts.isEmpty
+                      ? Text(
+                          'No personal contacts saved',
+                          style: TextStyle(
+                              color: const Color.fromARGB(176, 0, 141, 5),
+                              fontFamily: roboto),
+                        )
+                      : PersonalContactsDropdown(
+                          personalContacts: personalContacts,
+                          selectedContacts: selectedContacts,
+                          onChanged: (List<Contactt> newSelectedContacts) {
+                            setState(() {
+                              selectedContacts = newSelectedContacts;
+                            });
+                            final mobileNumbers = selectedContacts
+                                .map((contact) => contact.mobile)
+                                .join(' ');
+                            recipientsController.text = mobileNumbers;
+                          },
+                        ),
+              ]),
               TextFormField(
                 controller: recipientsController,
                 maxLines: 3,
