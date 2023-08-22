@@ -7,7 +7,6 @@ import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../constant/constant_colors.dart';
 import '../constant/constant_fonts.dart';
 import '../constant/constant_mediaquery.dart';
@@ -22,6 +21,7 @@ class MessageWidget extends StatefulWidget {
 
 class _MessageWidgetState extends State<MessageWidget> {
   String balance = " Loading";
+  String selectedPhoneNumber = '';
   List<Map<String, dynamic>> reports = [];
   List<Map<String, dynamic>> filteredReports = [];
   bool reportsFetched = false;
@@ -286,9 +286,19 @@ class _MessageWidgetState extends State<MessageWidget> {
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                onTap: () => goToPush(
-                                    context, const MessageDetailScreen()),
+                              child: GestureDetector(
+                                onTap: () {
+                                  selectedPhoneNumber =
+                                      reportData['mobile'].toString();
+                                  goToPush(
+                                    context,
+                                    MessageDetailPersonalScreen(
+                                      messageDetails:
+                                          MessageDetails.fromJson(reportData),
+                                      phoneNumber: selectedPhoneNumber,
+                                    ),
+                                  );
+                                },
                                 child: ListTile(
                                   shape: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),

@@ -38,7 +38,6 @@ class _SendMessageState extends State<SendMessage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadSavedBalance();
     recipientsController.text = widget.contact.mobile;
@@ -74,7 +73,7 @@ class _SendMessageState extends State<SendMessage> {
         // Update the saved balance in SharedPreferences
         prefs.setString('balance', '$newBalance');
 
-        //  recipientsController.clear();
+        recipientsController.clear();
         senderNameController.clear();
         messageController.clear();
 
