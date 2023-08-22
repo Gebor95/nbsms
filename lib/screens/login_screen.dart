@@ -46,28 +46,35 @@ class _LoginScreenState extends State<LoginScreen> {
       "password": pwordController.text,
       "action": "login",
     };
+
     final response = await http
         .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
 
-      if (data['status'] == "OK") {
-        // pageRoute()
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+
+      if (responseData['status'] == "OK") {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('username', emailController.text);
         prefs.setString('password', pwordController.text);
-        prefs.setString('userFullName', data['full_name']);
-        prefs.setString('userEmail', data['email']);
+
+        if (responseData['full_name'] != null) {
+          prefs.setString('userFullName', responseData['full_name']);
+        }
+        if (responseData['email'] != null) {
+          prefs.setString('userEmail', responseData['email']);
+        }
+
         pageRoute("logged_in");
         goToReplace(context, const HomeScreen());
       }
-      if (data['error'] != "") {
+      if (responseData['error'] != "") {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Invalid Credentials")));
-        print(data['error']);
+        print(responseData['error']);
       }
     } else {
-      const CircularProgressIndicator();
+      // Handle other cases or errors here
       print(response.body);
     }
   }
