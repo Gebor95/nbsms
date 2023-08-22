@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
@@ -14,7 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/drawer_widget.dart';
 
 class SendMessage extends StatefulWidget {
-  const SendMessage({super.key});
+  final Contactt contact;
+  const SendMessage({super.key, required this.contact});
 
   @override
   State<SendMessage> createState() => _SendMessageState();
@@ -22,6 +24,10 @@ class SendMessage extends StatefulWidget {
 
 class _SendMessageState extends State<SendMessage> {
   String balance = ' Loading';
+  final TextEditingController recipientsController = TextEditingController();
+  final TextEditingController senderNameController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
+
   Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String savedBalance = prefs.getString('balance') ?? " Loading";
@@ -35,17 +41,96 @@ class _SendMessageState extends State<SendMessage> {
     // TODO: implement initState
     super.initState();
     _loadSavedBalance();
+    recipientsController.text = widget.contact.mobile;
   }
 
-  // Initial Selected Value
-  String dropdownvalue = 'New Contacts';
+  Future<void> _sendMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
 
-  // List of items in our dropdown menu
-  var items = [
-    'New Contacts',
-    'Personal Contacts',
-    'Device Contacts',
-  ];
+    String recipients = recipientsController.text;
+    String senderName = senderNameController.text;
+    String message = messageController.text;
+
+    try {
+      final response = await sendMessage(
+          username, password, recipients, senderName, message);
+
+      final status = response['status'];
+      final count = response['count'];
+      final price = response['price'];
+
+      if (status == 'OK') {
+        double messageCost = double.parse(price.toString());
+        double currentBalance = double.parse(balance.replaceAll('₦', ''));
+        double newBalance = currentBalance - messageCost;
+
+        // Update the state to reflect the new balance
+        setState(() {
+          balance = '$newBalance';
+        });
+
+        // Update the saved balance in SharedPreferences
+        prefs.setString('balance', '$newBalance');
+
+        //  recipientsController.clear();
+        senderNameController.clear();
+        messageController.clear();
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Message Sent'),
+            content: Text(
+              'Status: $status\nCount: $count\nPrice: ₦$price',
+              style: TextStyle(fontFamily: roboto),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Message sending failed.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('An error occurred while sending the message.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +216,7 @@ class _SendMessageState extends State<SendMessage> {
               ),
               TextFormField(
                 maxLines: 3,
+                controller: recipientsController,
                 decoration: const InputDecoration(
                   hintText: "Seperate each phone number with a space",
                   border: OutlineInputBorder(
@@ -144,6 +230,7 @@ class _SendMessageState extends State<SendMessage> {
                 height: screenHeight(context) * 0.04,
               ),
               TextFormField(
+                controller: senderNameController,
                 decoration: const InputDecoration(
                   hintText: "OSPIVV",
                   border: OutlineInputBorder(
@@ -157,6 +244,7 @@ class _SendMessageState extends State<SendMessage> {
                 height: screenHeight(context) * 0.04,
               ),
               TextFormField(
+                controller: messageController,
                 maxLines: 5,
                 decoration: const InputDecoration(
                   hintText: "Message",
@@ -171,9 +259,7 @@ class _SendMessageState extends State<SendMessage> {
                 height: screenHeight(context) * 0.04,
               ),
               SubmitButton(
-                onTap: () {
-                  goToReplace(context, const SendMessage());
-                },
+                onTap: _sendMessage,
                 text: 'Send Message',
                 bgcolor: nbPrimarycolor,
                 fgcolor: nbSecondarycolor,

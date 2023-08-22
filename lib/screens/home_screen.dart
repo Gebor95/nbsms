@@ -1,7 +1,4 @@
-// ignore_for_file: avoid_print
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -25,9 +22,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // String? _name;
-  // String? _email;
-
   String balance = " Loading";
   bool hasShownAlert =
       false; // Variable to track whether the alert has been shown
@@ -42,9 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchBalance();
+
     _startAlertTimer();
-    // _fetchNameAndEmail();
     _loadSavedBalance();
     _loadPersonalContacts();
   }
@@ -116,14 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
         double currentBalance = double.parse(balance.replaceAll('₦', ''));
         double newBalance = currentBalance - messageCost;
 
-        // Update the state to reflect the new balance
         setState(() {
           balance = '$newBalance';
         });
-
-        // Update the saved balance in SharedPreferences
-        prefs.setString('balance', '$newBalance');
-
         recipientsController.clear();
         senderNameController.clear();
         messageController.clear();
@@ -132,10 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Message Sent'),
-            content: Text(
-              'Status: $status\nCount: $count\nPrice: ₦$price',
-              style: TextStyle(fontFamily: roboto),
-            ),
+            content: Text('Status: $status\nCount: $count\nPrice: $price'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -179,22 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       );
-    }
-  }
-
-  Future<void> _fetchBalance() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String username = prefs.getString('username') ?? '';
-    String password = prefs.getString('password') ?? '';
-
-    String fetchedBalance = await fetchBalance(username, password);
-
-    prefs.setString('balance', fetchedBalance); // Save the fetched balance
-
-    if (mounted) {
-      setState(() {
-        balance = fetchedBalance;
-      });
     }
   }
 
@@ -363,29 +332,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: screenHeight(context) * 0.03,
                 ),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (dropdownvalue == 'Personal Contacts')
-                  personalContacts.isEmpty
-                      ? Text(
-                          'No personal contacts saved',
-                          style: TextStyle(
-                              color: const Color.fromARGB(176, 0, 141, 5),
-                              fontFamily: roboto),
-                        )
-                      : PersonalContactsDropdown(
-                          personalContacts: personalContacts,
-                          selectedContacts: selectedContacts,
-                          onChanged: (List<Contactt> newSelectedContacts) {
-                            setState(() {
-                              selectedContacts = newSelectedContacts;
-                            });
-                            final mobileNumbers = selectedContacts
-                                .map((contact) => contact.mobile)
-                                .join(' ');
-                            recipientsController.text = mobileNumbers;
-                          },
-                        ),
-              ]),
+              if (dropdownvalue == 'Personal Contacts')
+                PersonalContactsDropdown(
+                    personalContacts: personalContacts,
+                    selectedContacts: selectedContacts,
+                    onChanged: (List<Contactt> newSelectedContacts) {
+                      setState(() {
+                        selectedContacts = newSelectedContacts;
+                      });
+                      final mobileNumbers = selectedContacts
+                          .map((contact) => contact.mobile)
+                          .join(' ');
+                      recipientsController.text = mobileNumbers;
+                    }),
               TextFormField(
                 controller: recipientsController,
                 maxLines: 3,
