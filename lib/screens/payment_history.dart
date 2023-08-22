@@ -162,7 +162,8 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                     ),
                     Text(
                       "Total: ₦$balance",
-                      style: const TextStyle(
+                      style: TextStyle(
+                          fontFamily: roboto,
                           color: Colors.grey,
                           fontSize: 17,
                           fontWeight: FontWeight.w600),
@@ -275,9 +276,10 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                                     ),
                                     Text(
                                       '₦ ${history[index]['amount']}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 20,
+                                          fontFamily: roboto,
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ],
