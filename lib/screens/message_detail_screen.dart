@@ -38,11 +38,15 @@ class MessageDetailPersonalScreen extends StatefulWidget {
   final MessageDetails messageDetails;
   final String phoneNumber;
   final String selectedStatus;
+  final Color selectedStatusColor;
+  final IconData selectedStatusIcon;
   const MessageDetailPersonalScreen(
       {super.key,
       required this.messageDetails,
       required this.phoneNumber,
-      required this.selectedStatus});
+      required this.selectedStatus,
+      required this.selectedStatusColor,
+      required this.selectedStatusIcon});
 
   @override
   State<MessageDetailPersonalScreen> createState() =>
@@ -108,7 +112,7 @@ class _MessageDetailPersonalScreenState
               style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
-              height: 30,
+              height: 10,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -117,12 +121,34 @@ class _MessageDetailPersonalScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.selectedStatus),
+                      Row(
+                        children: [
+                          Icon(
+                            widget.selectedStatusIcon,
+                            color: widget.selectedStatusColor,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            widget.selectedStatus,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: widget.selectedStatusColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       Text(
                         'Sender:                 ${widget.messageDetails.sender}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -130,7 +156,7 @@ class _MessageDetailPersonalScreenState
                         'Mobile:                  ${widget.phoneNumber}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -138,7 +164,7 @@ class _MessageDetailPersonalScreenState
                         'Price:                     ₦${widget.messageDetails.price}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -146,7 +172,7 @@ class _MessageDetailPersonalScreenState
                         'Units:                     ${widget.messageDetails.units}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -154,31 +180,31 @@ class _MessageDetailPersonalScreenState
                         'Length:                  ${widget.messageDetails.length}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Send Date:             ${widget.messageDetails.sendDate}',
+                        'Send Date:            ${widget.messageDetails.sendDate}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Created Date:        ${widget.messageDetails.sendDate}',
+                        'Created Date:       ${widget.messageDetails.sendDate}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Message: ${widget.messageDetails.message}',
+                        'Message: \n\n${widget.messageDetails.message}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                     ],

@@ -290,14 +290,20 @@ class _MessageWidgetState extends State<MessageWidget> {
                                 onTap: () {
                                   selectedPhoneNumber =
                                       reportData['mobile'].toString();
-                                  selectedStatus = reportData['status'];
+                                  final String status = reportData['status'];
+                                  final Color statusColor =
+                                      statusColors[status]!;
+                                  final IconData statusIcon =
+                                      statusIcons[status]!;
                                   goToPush(
                                     context,
                                     MessageDetailPersonalScreen(
                                       messageDetails:
                                           MessageDetails.fromJson(reportData),
                                       phoneNumber: selectedPhoneNumber,
-                                      selectedStatus: selectedStatus,
+                                      selectedStatus: status,
+                                      selectedStatusColor: statusColor,
+                                      selectedStatusIcon: statusIcon,
                                     ),
                                   );
                                 },
