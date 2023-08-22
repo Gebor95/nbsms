@@ -13,17 +13,10 @@ class PersonalContWidget extends StatefulWidget {
   State<PersonalContWidget> createState() => _PersonalContWidgetState();
 }
 
-//typedef ContactSelectCallback = void Function(Contactt contact);
-
 class _PersonalContWidgetState extends State<PersonalContWidget> {
-  //ContactSelectCallback? contactSelectCallback;
-
   @override
   void initState() {
     super.initState();
-    // contactSelectCallback = (contact) {
-    //   setState(() {});
-    // };
   }
 
   Future<List<Contactt>> fetchAndPrintContacts() async {
@@ -99,7 +92,7 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
                     subtitle: Text(contact.mobile),
                     trailing: IconButton(
                       onPressed: () {
-                        goToPush(context, const SendMessage());
+                        goToPush(context, SendMessage(contact: contact));
                       },
                       icon: Icon(
                         Icons.chat,
