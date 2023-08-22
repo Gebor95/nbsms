@@ -290,12 +290,14 @@ class _MessageWidgetState extends State<MessageWidget> {
                                 onTap: () {
                                   selectedPhoneNumber =
                                       reportData['mobile'].toString();
+                                  selectedStatus = reportData['status'];
                                   goToPush(
                                     context,
                                     MessageDetailPersonalScreen(
                                       messageDetails:
                                           MessageDetails.fromJson(reportData),
                                       phoneNumber: selectedPhoneNumber,
+                                      selectedStatus: selectedStatus,
                                     ),
                                   );
                                 },
