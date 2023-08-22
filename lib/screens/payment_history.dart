@@ -254,8 +254,8 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                             child: ListTile(
                                 shape: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
-                                    borderSide: const BorderSide(
-                                        color: Colors.black26)),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white)),
                                 trailing: const Icon(
                                   Icons.wallet_rounded,
                                   size: 40,

@@ -293,7 +293,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                   shape: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide:
-                                        const BorderSide(color: Colors.black26),
+                                        const BorderSide(color: Colors.white),
                                   ),
                                   leading: Icon(
                                     statusIcons[status],
