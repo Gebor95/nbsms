@@ -48,35 +48,48 @@ class _LoginScreenState extends State<LoginScreen> {
       "action": "login",
     };
 
-    final response = await http
-        .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+    try {
+      final response = await http.post(
+          Uri.parse("https://portal.fastsmsnigeria.com/api/?"),
+          body: data);
 
-    if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body);
+      print("Response status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
-      if (responseData['status'] == "OK") {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('username', emailController.text);
-        prefs.setString('password', pwordController.text);
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
 
-        if (responseData['full_name'] != null) {
-          prefs.setString('userFullName', responseData['full_name']);
+        print("Response data: $responseData");
+
+        if (responseData['status'] == "OK") {
+          print("Login successful!");
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('username', emailController.text);
+          prefs.setString('password', pwordController.text);
+
+          if (responseData['full_name'] != null) {
+            prefs.setString('userFullName', responseData['full_name']);
+          }
+          if (responseData['email'] != null) {
+            prefs.setString('userEmail', responseData['email']);
+          }
+
+          pageRoute("logged_in");
+          goToReplace(context, const HomeScreen());
+        } else {
+          print("Login failed: ${responseData['error']}");
+
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Invalid Credentials")));
         }
-        if (responseData['email'] != null) {
-          prefs.setString('userEmail', responseData['email']);
-        }
-
-        pageRoute("logged_in");
-        goToReplace(context, const HomeScreen());
+      } else {
+        // Handle other cases or errors here
+        print("Error response body: ${response.body}");
       }
-      if (responseData['error'] != "") {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Invalid Credentials")));
-        print(responseData['error']);
-      }
-    } else {
-      // Handle other cases or errors here
-      print(response.body);
+    } catch (error) {
+      // Handle any exceptions that may occur during the HTTP request
+      print("Error during HTTP request: $error");
     }
   }
 
