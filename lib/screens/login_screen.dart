@@ -23,6 +23,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _passwordVisible = false;
+  bool _isLoggingIn = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController pwordController = TextEditingController();
@@ -42,6 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   loginusrrqt() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
+
     var data = {
       "username": emailController.text,
       "password": pwordController.text,
@@ -90,6 +95,10 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       // Handle any exceptions that may occur during the HTTP request
       print("Error during HTTP request: $error");
+    } finally {
+      setState(() {
+        _isLoggingIn = false;
+      });
     }
   }
 
@@ -178,18 +187,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: screenHeight(context) * 0.05,
                                     ),
                                     TextFormField(
-                                        // onChanged: (value) =>
-                                        //     loginModel.setUsername(value),
-                                        controller: emailController,
-                                        decoration: const InputDecoration(
-                                          hintText: "Username | Email",
-                                        ),
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter your email';
-                                          }
-                                          return null;
-                                        }),
+                                      // onChanged: (value) =>
+                                      //     loginModel.setUsername(value),
+                                      controller: emailController,
+                                      decoration: const InputDecoration(
+                                        hintText: "Username | Email",
+                                      ),
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return 'Please enter your email';
+                                        }
+                                        return null;
+                                      },
+                                    ),
                                     SizedBox(
                                       height: screenHeight(context) * 0.02,
                                     ),
@@ -227,13 +237,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                         goToReplace(
                                             context, const SplashScreen());
                                       },
-                                      child: Container(
-                                        alignment: Alignment.bottomRight,
-                                        child: Text(
-                                          "Forgot Password",
-                                          style:
-                                              TextStyle(color: nbshadowcolor),
-                                        ),
+                                      child: Column(
+                                        children: [
+                                          // if (_isLoggingIn)
+                                          //   const CircularProgressIndicator(),
+                                          Container(
+                                            alignment: Alignment.bottomRight,
+                                            child: Text(
+                                              "Forgot Password",
+                                              style: TextStyle(
+                                                  color: nbshadowcolor),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     SizedBox(
@@ -245,13 +261,59 @@ class _LoginScreenState extends State<LoginScreen> {
                                           loginusrrqt();
                                         }
                                       },
-                                      text: 'Login',
+                                      text: _isLoggingIn
+                                          ? ''
+                                          : 'Login', // Hide text while logging in
                                       bgcolor: nbPrimarycolor,
                                       fgcolor: nbSecondarycolor,
                                       width: screenWidth(context) * 0.95,
                                       textStyle: TextStyle(
-                                          fontWeight: fnt500, fontSize: 16.0),
+                                        fontWeight: fnt500,
+                                        fontSize: 16.0,
+                                      ),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Visibility(
+                                            visible: _isLoggingIn,
+                                            child:
+                                                const CircularProgressIndicator(
+                                              strokeWidth:
+                                                  2.0, // Adjust the thickness of the circle
+                                              backgroundColor: Colors
+                                                  .grey, // Set the background color
+                                              valueColor: AlwaysStoppedAnimation<
+                                                      Color>(
+                                                  Colors
+                                                      .white), // Set the color
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: !_isLoggingIn,
+                                            child: Text(
+                                              'Login',
+                                              style: TextStyle(
+                                                color: nbSecondarycolor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
+
+                                    // SubmitButton(
+                                    //   onTap: () {
+                                    //     if (_formKey.currentState!.validate()) {
+                                    //       loginusrrqt();
+                                    //     }
+                                    //   },
+                                    //   text: 'Login',
+                                    //   bgcolor: nbPrimarycolor,
+                                    //   fgcolor: nbSecondarycolor,
+                                    //   width: screenWidth(context) * 0.95,
+                                    //   textStyle: TextStyle(
+                                    //       fontWeight: fnt500, fontSize: 16.0),
+                                    // ),
                                   ],
                                 ),
                               ),

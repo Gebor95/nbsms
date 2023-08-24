@@ -22,15 +22,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // String? _name;
-  // String? _email;
-
   String balance = " Loading";
-  bool hasShownAlert =
-      false; // Variable to track whether the alert has been shown
+  bool hasShownAlert = false;
   Contactt? selectedContact;
   List<Contactt> personalContacts = [];
   List<Contactt> selectedContacts = [];
+  final _formKey = GlobalKey<FormState>();
   Timer? _alertTimer;
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
@@ -41,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _fetchBalance();
     _startAlertTimer();
-    // _fetchNameAndEmail();
     _loadSavedBalance();
     _loadPersonalContacts();
   }
@@ -89,6 +85,33 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       balance = savedBalance;
     });
+  }
+
+  // Validator function for checking if recipients are entered correctly
+  String? validateRecipients(String value) {
+    if (value.isEmpty) {
+      return "Recipients cannot be empty";
+    }
+    // You can add more validation rules here if needed
+    return null;
+  }
+
+  // Validator function for checking if sender name is entered
+  String? validateSenderName(String value) {
+    if (value.isEmpty) {
+      return "Sender name cannot be empty";
+    }
+    // You can add more validation rules here if needed
+    return null;
+  }
+
+  // Validator function for checking if message is entered
+  String? validateMessage(String value) {
+    if (value.isEmpty) {
+      return "Message cannot be empty";
+    }
+    // You can add more validation rules here if needed
+    return null;
   }
 
   Future<void> _sendMessage() async {
@@ -313,137 +336,159 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const PageTitle(
-                text: "Text Message",
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.06,
-              ),
-              DropdownButtonFormField(
-                value: dropdownvalue,
-                items: items.map((String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownvalue = newValue!;
-                    if (newValue == 'Personal Contacts') {
-                      selectedContact = null;
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const PageTitle(
+                  text: "Text Message",
+                ),
+                SizedBox(
+                  height: screenHeight(context) * 0.06,
+                ),
+                DropdownButtonFormField(
+                  value: dropdownvalue,
+                  items: items.map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(items),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      dropdownvalue = newValue!;
+                      if (newValue == 'Personal Contacts') {
+                        selectedContact = null;
+                      }
+                    });
+                    if (newValue == 'Device Contacts') {
+                      // _pickDeviceContacts();
+                    } else {
+                      recipientsController.clear();
                     }
-                  });
-                  if (newValue == 'Device Contacts') {
-                    // _pickDeviceContacts();
-                  } else {
-                    recipientsController.clear();
-                  }
-                },
-                decoration: const InputDecoration(
-                  alignLabelWithHint: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
-                  ),
-                  labelText: "Select Contact",
-                ),
-              ),
-              if (dropdownvalue == 'New Contacts')
-                SizedBox(
-                  height: screenHeight(context) * 0.03,
-                ),
-              if (dropdownvalue == 'Device Contacts')
-                SizedBox(
-                  height: screenHeight(context) * 0.03,
-                ),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (dropdownvalue == 'Personal Contacts')
-                  personalContacts.isEmpty
-                      ? Text(
-                          'No personal contacts saved',
-                          style: TextStyle(
-                              color: const Color.fromARGB(176, 0, 141, 5),
-                              fontFamily: roboto),
-                        )
-                      : PersonalContactsDropdown(
-                          personalContacts: personalContacts,
-                          selectedContacts: selectedContacts,
-                          onChanged: (List<Contactt> newSelectedContacts) {
-                            setState(() {
-                              selectedContacts = newSelectedContacts;
-                            });
-                            final mobileNumbers = selectedContacts
-                                .map((contact) => contact.mobile)
-                                .join(' ');
-                            recipientsController.text = mobileNumbers;
-                          },
-                        ),
-              ]),
-              const SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                controller: recipientsController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: "Separate each phone number with a space",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 1,
-                      color: Colors.greenAccent,
+                  },
+                  decoration: const InputDecoration(
+                    alignLabelWithHint: true,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          width: 1, color: Colors.greenAccent), //<-- SEE HERE
                     ),
+                    labelText: "Select Contact",
                   ),
-                  labelText: "Recipients",
                 ),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.04,
-              ),
-              TextFormField(
-                controller: senderNameController,
-                decoration: const InputDecoration(
-                  hintText: "OSPIVV",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                if (dropdownvalue == 'New Contacts')
+                  SizedBox(
+                    height: screenHeight(context) * 0.03,
                   ),
-                  label: Text("Sender Name"),
-                ),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.04,
-              ),
-              TextFormField(
-                controller: messageController,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: "Message",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                if (dropdownvalue == 'Device Contacts')
+                  SizedBox(
+                    height: screenHeight(context) * 0.03,
                   ),
-                  label: Text("Message"),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  if (dropdownvalue == 'Personal Contacts')
+                    personalContacts.isEmpty
+                        ? Text(
+                            'No personal contacts saved',
+                            style: TextStyle(
+                                color: const Color.fromARGB(176, 0, 141, 5),
+                                fontFamily: roboto),
+                          )
+                        : PersonalContactsDropdown(
+                            personalContacts: personalContacts,
+                            selectedContacts: selectedContacts,
+                            onChanged: (List<Contactt> newSelectedContacts) {
+                              setState(() {
+                                selectedContacts = newSelectedContacts;
+                              });
+                              final mobileNumbers = selectedContacts
+                                  .map((contact) => contact.mobile)
+                                  .join(' ');
+                              recipientsController.text = mobileNumbers;
+                            },
+                          ),
+                ]),
+                const SizedBox(
+                  height: 10,
                 ),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.04,
-              ),
-              SubmitButton(
-                onTap: _sendMessage,
-                text: 'Send Message',
-                bgcolor: nbPrimarycolor,
-                fgcolor: nbSecondarycolor,
-                width: screenWidth(context) * 0.95,
-                textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.03,
-              ),
-            ],
+                TextFormField(
+                    controller: recipientsController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: "Separate each phone number with a space",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Colors.greenAccent,
+                        ),
+                      ),
+                      labelText: "Recipients",
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your recipient number';
+                      }
+                      return null;
+                    }),
+                SizedBox(
+                  height: screenHeight(context) * 0.04,
+                ),
+                TextFormField(
+                    controller: senderNameController,
+                    decoration: const InputDecoration(
+                      hintText: "OSPIVV",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      ),
+                      label: Text("Sender Name"),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your sender name';
+                      }
+                      return null;
+                    }),
+                SizedBox(
+                  height: screenHeight(context) * 0.04,
+                ),
+                TextFormField(
+                    controller: messageController,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      hintText: "Message",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      ),
+                      label: Text("Message"),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your message';
+                      }
+                      return null;
+                    }),
+                SizedBox(
+                  height: screenHeight(context) * 0.04,
+                ),
+                SubmitButton(
+                  onTap: () {
+                    if (_formKey.currentState!.validate()) {
+                      _sendMessage();
+                    }
+                  },
+                  text: 'Send Message',
+                  bgcolor: nbPrimarycolor,
+                  fgcolor: nbSecondarycolor,
+                  width: screenWidth(context) * 0.95,
+                  textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
+                ),
+                SizedBox(
+                  height: screenHeight(context) * 0.03,
+                ),
+              ],
+            ),
           ),
         ),
       ),
