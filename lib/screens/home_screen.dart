@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -92,6 +95,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _sendMessage() async {
+    const snack = SnackBar(
+      content: Text("Sending"),
+      duration: Duration(seconds: 5),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snack);
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
@@ -439,6 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 fgcolor: nbSecondarycolor,
                 width: screenWidth(context) * 0.95,
                 textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
+                //add snackbar
               ),
               SizedBox(
                 height: screenHeight(context) * 0.03,

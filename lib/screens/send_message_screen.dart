@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -44,6 +46,12 @@ class _SendMessageState extends State<SendMessage> {
   }
 
   Future<void> _sendMessage() async {
+    const snack = SnackBar(
+      content: Text("Sending"),
+      duration: Duration(seconds: 5),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snack);
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
@@ -217,7 +225,7 @@ class _SendMessageState extends State<SendMessage> {
                 maxLines: 3,
                 controller: recipientsController,
                 decoration: const InputDecoration(
-                  hintText: "Seperate each phone number with a space",
+                  hintText: "Separate each phone number with a space",
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                         width: 1, color: Colors.greenAccent), //<-- SEE HERE
