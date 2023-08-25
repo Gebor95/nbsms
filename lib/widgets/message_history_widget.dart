@@ -21,6 +21,7 @@ class MessageWidget extends StatefulWidget {
 
 class _MessageWidgetState extends State<MessageWidget> {
   String balance = " Loading";
+  bool isLoading = false;
   String selectedPhoneNumber = '';
   List<Map<String, dynamic>> reports = [];
   List<Map<String, dynamic>> filteredReports = [];
@@ -78,7 +79,11 @@ class _MessageWidgetState extends State<MessageWidget> {
   }
 
   final smsCatCtrl = TextEditingController();
-  void _filterReports(String selectedStatus) {
+  void _filterReports(String selectedStatus) async {
+    setState(() {
+      isLoading = true; // Set isLoading to true when fetching
+    });
+
     setState(() {
       if (selectedStatus.isEmpty) {
         // If no status is selected, show all reports
@@ -99,6 +104,9 @@ class _MessageWidgetState extends State<MessageWidget> {
         // If an unknown status is selected, show all reports
         filteredReports = reports;
       }
+    });
+    setState(() {
+      isLoading = false;
     });
   }
 

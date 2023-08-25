@@ -24,6 +24,8 @@ class _PaymentHistoryState extends State<PaymentHistory> {
   List<Map<String, dynamic>> history = [];
   bool paymentFetched = false;
   String selectedStatus = 'All';
+  List<Map<String, dynamic>> cachedPaymentHistory =
+      []; // Initialize as empty list
 
   @override
   void initState() {
@@ -46,6 +48,12 @@ class _PaymentHistoryState extends State<PaymentHistory> {
     String password = prefs.getString('password') ?? '';
 
     try {
+      if (cachedPaymentHistory.isEmpty) {
+        cachedPaymentHistory = await fetchPayment(username, password);
+      }
+      setState(() {
+        paymentFetched = false;
+      });
       List<Map<String, dynamic>> fetchedPayment =
           await fetchPayment(username, password);
 
@@ -73,6 +81,19 @@ class _PaymentHistoryState extends State<PaymentHistory> {
   final smsCatCtrl = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    double totalOnline = 0;
+    double totalOffline = 0;
+
+    for (var payment in history) {
+      if (payment['reference'] == null) {
+        totalOffline += double.parse(payment['amount']);
+      } else {
+        totalOnline += double.parse(payment['amount']);
+      }
+    }
+
+    String totalRecharge = (totalOnline + totalOffline).toStringAsFixed(0);
+
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
@@ -161,13 +182,14 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                           fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      "Total: ₦$balance",
+                      "Total: ₦$totalRecharge",
                       style: TextStyle(
-                          fontFamily: roboto,
-                          color: Colors.grey,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600),
-                    )
+                        fontFamily: roboto,
+                        color: Colors.grey,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -202,7 +224,21 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                     setState(() {
                       selectedStatus = selectedValue;
                     });
-                    fetchPaymentHistory(selectedStatus);
+
+                    if (selectedStatus == 'All') {
+                      fetchPaymentHistory(selectedStatus);
+                    } else {
+                      // Use cached data for offline/online
+                      setState(() {
+                        history = cachedPaymentHistory.where((payment) {
+                          bool isOfflineRecharge = payment['reference'] == null;
+                          return isOfflineRecharge
+                              ? selectedStatus == 'Offline'
+                              : selectedStatus == 'Online';
+                        }).toList();
+                        paymentFetched = true;
+                      });
+                    }
                   },
                 ),
               ),
@@ -227,7 +263,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                                 color: nbPrimarycolor,
                               ),
                               child: Image.asset(
-                                'assets/images/messages.jpg',
+                                'assets/images/purchase.jpg',
                                 scale: 0.5,
                               ),
                             ),
