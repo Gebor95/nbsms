@@ -278,14 +278,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                             visible: _isLoggingIn,
                                             child:
                                                 const CircularProgressIndicator(
-                                              strokeWidth:
-                                                  2.0, // Adjust the thickness of the circle
+                                              strokeWidth: 2.0,
                                               backgroundColor: Colors
                                                   .grey, // Set the background color
-                                              valueColor: AlwaysStoppedAnimation<
-                                                      Color>(
-                                                  Colors
-                                                      .white), // Set the color
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.white),
                                             ),
                                           ),
                                           Visibility(
