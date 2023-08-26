@@ -42,8 +42,9 @@ dependencies:
   crypto: ^3.0.3
   gap: ^3.0.1
   animated_custom_dropdown: ^1.5.0
-  contacts_service: ^0.6.3
+  
   permission_handler: ^10.4.3
+  url_launcher: ^6.1.12
   
 
 dev_dependencies:
