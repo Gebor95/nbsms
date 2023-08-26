@@ -73,7 +73,6 @@ class _PaymentHistoryState extends State<PaymentHistory> {
         paymentFetched = true;
       });
     } catch (e) {
-      print("Error fetching reports: $e");
       // Handle the error as needed
     }
   }

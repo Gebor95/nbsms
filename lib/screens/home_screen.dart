@@ -74,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Contactt> fetchedContacts = await fetchContacts(username, password);
       return fetchedContacts;
     } catch (e) {
-      print("Error fetching contacts: $e");
       return []; // Return an empty list in case of an error
     }
   }

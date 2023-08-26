@@ -7,8 +7,7 @@ import 'package:nbsms/constant/constant_images.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
-import 'package:nbsms/screens/register_screen.dart';
-import 'package:nbsms/screens/splash_screen.dart';
+import 'package:url_launcher/link.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -58,17 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
           Uri.parse("https://portal.fastsmsnigeria.com/api/?"),
           body: data);
 
-      print("Response status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
-
       if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
 
-        print("Response data: $responseData");
-
         if (responseData['status'] == "OK") {
-          print("Login successful!");
-
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('username', emailController.text);
           prefs.setString('password', pwordController.text);
@@ -83,18 +75,12 @@ class _LoginScreenState extends State<LoginScreen> {
           pageRoute("logged_in");
           goToReplace(context, const HomeScreen());
         } else {
-          print("Login failed: ${responseData['error']}");
-
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Invalid Credentials")));
         }
-      } else {
-        // Handle other cases or errors here
-        print("Error response body: ${response.body}");
-      }
+      } else {}
     } catch (error) {
       // Handle any exceptions that may occur during the HTTP request
-      print("Error during HTTP request: $error");
     } finally {
       setState(() {
         _isLoggingIn = false;
@@ -232,28 +218,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                     SizedBox(
                                       height: screenHeight(context) * 0.03,
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        goToReplace(
-                                            context, const SplashScreen());
-                                      },
-                                      child: Column(
-                                        children: [
-                                          // if (_isLoggingIn)
-                                          //   const CircularProgressIndicator(),
-                                          Container(
-                                            alignment: Alignment.bottomRight,
-                                            child: Text(
-                                              "Forgot Password",
-                                              style: TextStyle(
-                                                  color: nbshadowcolor),
-                                            ),
-                                          ),
-                                        ],
+                                    Container(
+                                      alignment: Alignment.bottomRight,
+                                      child: Link(
+                                        uri: Uri.parse(
+                                            'https://portal.nigeriabulksms.com/password/'),
+                                        builder: (context, followLink) =>
+                                            TextButton(
+                                          onPressed: followLink,
+                                          child: const Text("Forgot Password"),
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
-                                      height: screenHeight(context) * 0.06,
+                                      height: screenHeight(context) * 0.04,
                                     ),
                                     SubmitButton(
                                       onTap: () {
@@ -306,11 +284,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           Container(
                               margin: EdgeInsets.only(
                                   top: screenHeight(context) * 0.06),
-                              child: TextButton(
-                                  onPressed: () {
-                                    goToPush(context, const RegisterAccount());
-                                  },
-                                  child: const Text("Register Account"))),
+                              child: Link(
+                                uri: Uri.parse(
+                                    'https://portal.nigeriabulksms.com/register'),
+                                builder: (context, followLink) => TextButton(
+                                  onPressed: followLink,
+                                  child: const Text("Register Account"),
+                                ),
+                              ))
                         ],
                       ),
                     ),
