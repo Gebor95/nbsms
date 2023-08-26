@@ -298,20 +298,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ],
                                       ),
                                     ),
-
-                                    // SubmitButton(
-                                    //   onTap: () {
-                                    //     if (_formKey.currentState!.validate()) {
-                                    //       loginusrrqt();
-                                    //     }
-                                    //   },
-                                    //   text: 'Login',
-                                    //   bgcolor: nbPrimarycolor,
-                                    //   fgcolor: nbSecondarycolor,
-                                    //   width: screenWidth(context) * 0.95,
-                                    //   textStyle: TextStyle(
-                                    //       fontWeight: fnt500, fontSize: 16.0),
-                                    // ),
                                   ],
                                 ),
                               ),
