@@ -73,7 +73,6 @@ class _MessageWidgetState extends State<MessageWidget> {
         reportsFetched = true; // Set reportsFetched to true
       });
     } catch (e) {
-      print("Error fetching reports: $e");
       // Handle the error as needed
     }
   }

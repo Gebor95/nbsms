@@ -89,7 +89,7 @@ Future<List<Map<String, dynamic>>> fetchReports(
 
   if (response.statusCode == 200) {
     List<dynamic> responseData = jsonDecode(response.body);
-    print(responseData);
+
     return responseData.cast<Map<String, dynamic>>();
   } else {
     throw Exception("Failed to fetch reports.");
@@ -110,7 +110,7 @@ Future<List<MessageDetails>> fetchMessageDetails(
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    print(data);
+
     return List<MessageDetails>.from(
         data.map((messageJson) => MessageDetails.fromJson(messageJson)));
   } else {
@@ -132,7 +132,7 @@ Future<List<Map<String, dynamic>>> fetchPayment(
 
   if (response.statusCode == 200) {
     var responseData = jsonDecode(response.body);
-    print(responseData);
+
     return responseData.cast<Map<String, dynamic>>();
   } else {
     throw Exception("Failed to fetch payments.");
