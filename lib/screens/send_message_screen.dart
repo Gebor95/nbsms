@@ -24,6 +24,10 @@ class SendMessage extends StatefulWidget {
 
 class _SendMessageState extends State<SendMessage> {
   String balance = ' Loading';
+  bool _isLoggingIn = false;
+  final _formKey = GlobalKey<FormState>();
+  late ScaffoldMessengerState _scaffoldMessengerState;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
@@ -43,7 +47,17 @@ class _SendMessageState extends State<SendMessage> {
     recipientsController.text = widget.contact.mobile;
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
+  }
+
   Future<void> _sendMessage() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
@@ -65,39 +79,47 @@ class _SendMessageState extends State<SendMessage> {
         double currentBalance = double.parse(balance.replaceAll('₦', ''));
         double newBalance = currentBalance - messageCost;
 
-        // Update the state to reflect the new balance
-        setState(() {
-          balance = '$newBalance';
-        });
-
-        // Update the saved balance in SharedPreferences
-        prefs.setString('balance', '$newBalance');
-
-        recipientsController.clear();
-        senderNameController.clear();
-        messageController.clear();
-
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Message Sent'),
-            content: Text(
-              'Status: $status\nCount: $count\nPrice: ₦$price',
-              style: TextStyle(fontFamily: roboto),
+        // Check for insufficient funds
+        if (newBalance < 3) {
+          _scaffoldMessengerState.showSnackBar(
+            const SnackBar(
+              content: Text('Insufficient funds'),
+              duration: Duration(seconds: 3),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
+          );
+        } else {
+          setState(() {
+            balance = '$newBalance';
+          });
+
+          prefs.setString('balance', '$newBalance');
+
+          recipientsController.clear();
+          senderNameController.clear();
+          messageController.clear();
+
+          showDialog(
+            context: _scaffoldKey.currentContext!,
+            builder: (context) => AlertDialog(
+              title: const Text('Message Sent'),
+              content: Text(
+                'Status: $status\nCount: $count\nPrice: ₦$price',
+                style: TextStyle(fontFamily: roboto),
               ),
-            ],
-          ),
-        );
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
       } else {
         showDialog(
-          context: context,
+          context: _scaffoldKey.currentContext!,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
             content: const Text('Message sending failed.'),
@@ -114,7 +136,7 @@ class _SendMessageState extends State<SendMessage> {
       }
     } catch (e) {
       showDialog(
-        context: context,
+        context: _scaffoldKey.currentContext!,
         builder: (context) => AlertDialog(
           title: const Text('Error'),
           content: const Text('An error occurred while sending the message.'),
@@ -128,12 +150,17 @@ class _SendMessageState extends State<SendMessage> {
           ],
         ),
       );
+    } finally {
+      setState(() {
+        _isLoggingIn = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: false,
         leadingWidth: screenWidth(context) * 0.09,
@@ -204,71 +231,117 @@ class _SendMessageState extends State<SendMessage> {
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const PageTitle(
-                text: "Text Message",
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.02,
-              ),
-              TextFormField(
-                maxLines: 3,
-                controller: recipientsController,
-                decoration: const InputDecoration(
-                  hintText: "Seperate each phone number with a space",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
-                  ),
-                  label: Text("Recipients"),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const PageTitle(
+                  text: "Text Message",
                 ),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.04,
-              ),
-              TextFormField(
-                controller: senderNameController,
-                decoration: const InputDecoration(
-                  hintText: "OSPIVV",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
-                  ),
-                  label: Text("Sender Name"),
+                SizedBox(
+                  height: screenHeight(context) * 0.02,
                 ),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.04,
-              ),
-              TextFormField(
-                controller: messageController,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: "Message",
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Colors.greenAccent), //<-- SEE HERE
-                  ),
-                  label: Text("Message"),
+                TextFormField(
+                    maxLines: 3,
+                    controller: recipientsController,
+                    decoration: const InputDecoration(
+                      hintText: "Seperate each phone number with a space",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      ),
+                      label: Text("Recipients"),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your recipient number';
+                      }
+                      return null;
+                    }),
+                SizedBox(
+                  height: screenHeight(context) * 0.04,
                 ),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.04,
-              ),
-              SubmitButton(
-                onTap: _sendMessage,
-                text: 'Send Message',
-                bgcolor: nbPrimarycolor,
-                fgcolor: nbSecondarycolor,
-                width: screenWidth(context) * 0.95,
-                textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
-              ),
-              SizedBox(
-                height: screenHeight(context) * 0.03,
-              ),
-            ],
+                TextFormField(
+                    controller: senderNameController,
+                    decoration: const InputDecoration(
+                      hintText: "OSPIVV",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      ),
+                      label: Text("Sender Name"),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your sender name';
+                      }
+                      return null;
+                    }),
+                SizedBox(
+                  height: screenHeight(context) * 0.04,
+                ),
+                TextFormField(
+                    controller: messageController,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      hintText: "Message",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      ),
+                      label: Text("Message"),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your message';
+                      }
+                      return null;
+                    }),
+                SizedBox(
+                  height: screenHeight(context) * 0.04,
+                ),
+                SubmitButton(
+                  onTap: () {
+                    if (_formKey.currentState!.validate()) {
+                      _sendMessage();
+                    }
+                  },
+                  text: _isLoggingIn ? '' : 'Send Message',
+                  bgcolor: nbPrimarycolor,
+                  fgcolor: nbSecondarycolor,
+                  width: screenWidth(context) * 0.95,
+                  textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Visibility(
+                        visible: _isLoggingIn,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2.0,
+                          backgroundColor:
+                              Colors.grey, // Set the background color
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      Visibility(
+                        visible: !_isLoggingIn,
+                        child: Text(
+                          'Send Message',
+                          style: TextStyle(
+                            color: nbSecondarycolor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: screenHeight(context) * 0.03,
+                ),
+              ],
+            ),
           ),
         ),
       ),

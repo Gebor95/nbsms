@@ -23,11 +23,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String balance = " Loading";
+  bool isBulkNumberSelected = false;
+  bool _isLoggingIn = false;
+  String selectedBulkNumber = '';
   bool hasShownAlert = false;
+  List<String> fetchedBulkNumbers = [];
+  List<Map<String, dynamic>> fetchedBulkNumbersWithSelection = [];
   Contactt? selectedContact;
   List<Contactt> personalContacts = [];
   List<Contactt> selectedContacts = [];
+  late ScaffoldMessengerState _scaffoldMessengerState;
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   Timer? _alertTimer;
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
@@ -40,6 +48,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _startAlertTimer();
     _loadSavedBalance();
     _loadPersonalContacts();
+    _fetchBulkNumberWithSelection();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scaffoldMessengerState = ScaffoldMessenger.of(context);
   }
 
   Future<void> _loadPersonalContacts() async {
@@ -78,6 +93,55 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<List<Map<String, dynamic>>> _fetchBulkNumber() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    String password = prefs.getString('password') ?? '';
+
+    try {
+      List<Map<String, dynamic>> fetchedBulkNumber =
+          await fetchBulkNumber(username, password);
+
+      // Add a selected flag to each item
+      List<Map<String, dynamic>> bulkNumbersWithSelection =
+          fetchedBulkNumber.map((data) {
+        return {
+          'name': data['name'] as String,
+          'selected': false,
+        };
+      }).toList();
+
+      return bulkNumbersWithSelection;
+    } catch (e) {
+      print('Error fetching bulk numbers: $e');
+      return []; // Return an empty list or handle the error case as needed
+    }
+  }
+
+  Future<void> _fetchBulkNumberWithSelection() async {
+    List<Map<String, dynamic>> bulkNumbers = await _fetchBulkNumber();
+    setState(() {
+      fetchedBulkNumbersWithSelection = bulkNumbers;
+    });
+  }
+
+  // Future<List<String>> _fetchBulkNumber() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String username = prefs.getString('username') ?? '';
+  //   String password = prefs.getString('password') ?? '';
+
+  //   try {
+  //     List<Map<String, dynamic>> fetchedBulkNumber =
+  //         await fetchBulkNumber(username, password);
+  //     List<String> names =
+  //         fetchedBulkNumber.map((data) => data['name'] as String).toList();
+  //     return names;
+  //   } catch (e) {
+  //     print('Error fetching bulk numbers: $e');
+  //     return []; // Return an empty list or handle the error case as needed
+  //   }
+  // }
+
   Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String savedBalance = prefs.getString('balance') ?? " Loading";
@@ -86,34 +150,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Validator function for checking if recipients are entered correctly
-  String? validateRecipients(String value) {
-    if (value.isEmpty) {
-      return "Recipients cannot be empty";
-    }
-    // You can add more validation rules here if needed
-    return null;
-  }
-
-  // Validator function for checking if sender name is entered
-  String? validateSenderName(String value) {
-    if (value.isEmpty) {
-      return "Sender name cannot be empty";
-    }
-    // You can add more validation rules here if needed
-    return null;
-  }
-
-  // Validator function for checking if message is entered
-  String? validateMessage(String value) {
-    if (value.isEmpty) {
-      return "Message cannot be empty";
-    }
-    // You can add more validation rules here if needed
-    return null;
-  }
-
   Future<void> _sendMessage() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
@@ -135,39 +176,47 @@ class _HomeScreenState extends State<HomeScreen> {
         double currentBalance = double.parse(balance.replaceAll('₦', ''));
         double newBalance = currentBalance - messageCost;
 
-        // Update the state to reflect the new balance
-        setState(() {
-          balance = '$newBalance';
-        });
-
-        // Update the saved balance in SharedPreferences
-        prefs.setString('balance', '$newBalance');
-
-        recipientsController.clear();
-        senderNameController.clear();
-        messageController.clear();
-
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Message Sent'),
-            content: Text(
-              'Status: $status\nCount: $count\nPrice: ₦$price',
-              style: TextStyle(fontFamily: roboto),
+        // Check for insufficient funds
+        if (newBalance < 3) {
+          _scaffoldMessengerState.showSnackBar(
+            const SnackBar(
+              content: Text('Insufficient funds'),
+              duration: Duration(seconds: 3),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
+          );
+        } else {
+          setState(() {
+            balance = '$newBalance';
+          });
+
+          prefs.setString('balance', '$newBalance');
+
+          recipientsController.clear();
+          senderNameController.clear();
+          messageController.clear();
+
+          showDialog(
+            context: _scaffoldKey.currentContext!,
+            builder: (context) => AlertDialog(
+              title: const Text('Message Sent'),
+              content: Text(
+                'Status: $status\nCount: $count\nPrice: ₦$price',
+                style: TextStyle(fontFamily: roboto),
               ),
-            ],
-          ),
-        );
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
       } else {
         showDialog(
-          context: context,
+          context: _scaffoldKey.currentContext!,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
             content: const Text('Message sending failed.'),
@@ -184,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       showDialog(
-        context: context,
+        context: _scaffoldKey.currentContext!,
         builder: (context) => AlertDialog(
           title: const Text('Error'),
           content: const Text('An error occurred while sending the message.'),
@@ -198,6 +247,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       );
+    } finally {
+      setState(() {
+        _isLoggingIn = false;
+      });
     }
   }
 
@@ -260,11 +313,13 @@ class _HomeScreenState extends State<HomeScreen> {
     'New Contacts',
     'Personal Contacts',
     'Device Contacts',
+    'Bulk Numbers'
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: false,
         leadingWidth: screenWidth(context) * 0.09,
@@ -354,18 +409,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Text(items),
                     );
                   }).toList(),
-                  onChanged: (String? newValue) {
+                  onChanged: (String? newValue) async {
+                    if (newValue != 'Bulk Numbers') {
+                      setState(() {
+                        selectedBulkNumber = '';
+                      });
+                    }
+                    List<String> bulkNumbers = [];
+
+                    if (newValue == 'Bulk Numbers') {
+                      bulkNumbers = (await _fetchBulkNumber()).cast<String>();
+                    }
+
                     setState(() {
                       dropdownvalue = newValue!;
+                      isBulkNumberSelected = newValue == 'Bulk Numbers';
+                      fetchedBulkNumbers = bulkNumbers;
                       if (newValue == 'Personal Contacts') {
                         selectedContact = null;
+                      } else if (newValue != 'Bulk Numbers') {
+                        recipientsController.clear();
                       }
                     });
-                    if (newValue == 'Device Contacts') {
-                      // _pickDeviceContacts();
-                    } else {
-                      recipientsController.clear();
-                    }
                   },
                   decoration: const InputDecoration(
                     alignLabelWithHint: true,
@@ -384,6 +449,102 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(
                     height: screenHeight(context) * 0.03,
                   ),
+                if (dropdownvalue == 'Bulk Numbers') ...[
+                  SizedBox(
+                    height: screenHeight(context) * 0.03,
+                  ),
+                  if (fetchedBulkNumbersWithSelection.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Fetched Bulk Numbers:',
+                          style: TextStyle(
+                            color: const Color.fromARGB(176, 0, 141, 5),
+                            fontFamily: roboto,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        for (int index = 0;
+                            index < fetchedBulkNumbersWithSelection.length;
+                            index++)
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: fetchedBulkNumbersWithSelection[index]
+                                    ['selected'],
+                                onChanged: (bool? newValue) {
+                                  setState(() {
+                                    for (int i = 0;
+                                        i <
+                                            fetchedBulkNumbersWithSelection
+                                                .length;
+                                        i++) {
+                                      fetchedBulkNumbersWithSelection[i]
+                                          ['selected'] = false;
+                                    }
+                                    fetchedBulkNumbersWithSelection[index]
+                                        ['selected'] = newValue!;
+                                  });
+                                },
+                              ),
+                              Text(
+                                fetchedBulkNumbersWithSelection[index]['name']
+                                    as String,
+                                style: TextStyle(
+                                  fontFamily: roboto,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  if (fetchedBulkNumbersWithSelection.isEmpty)
+                    Text(
+                      'No bulk numbers available',
+                      style: TextStyle(
+                        color: const Color.fromARGB(176, 0, 141, 5),
+                        fontFamily: roboto,
+                      ),
+                    ),
+                ],
+
+                // if (dropdownvalue == 'Bulk Numbers') ...[
+                //   SizedBox(
+                //     height: screenHeight(context) * 0.03,
+                //   ),
+                //   if (fetchedBulkNumbers.isNotEmpty)
+                //     Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Text(
+                //           'Fetched Bulk Numbers:',
+                //           style: TextStyle(
+                //             color: const Color.fromARGB(176, 0, 141, 5),
+                //             fontFamily: roboto,
+                //           ),
+                //         ),
+                //         const SizedBox(height: 8),
+                //         for (String number in fetchedBulkNumbers)
+                //           Text(
+                //             number,
+                //             style: TextStyle(
+                //               fontFamily: roboto,
+                //               fontSize: 14,
+                //             ),
+                //           ),
+                //       ],
+                //     ),
+                //   if (fetchedBulkNumbers.isEmpty)
+                //     Text(
+                //       'No bulk numbers available',
+                //       style: TextStyle(
+                //         color: const Color.fromARGB(176, 0, 141, 5),
+                //         fontFamily: roboto,
+                //       ),
+                //     ),
+                // ],
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   if (dropdownvalue == 'Personal Contacts')
                     personalContacts.isEmpty
@@ -410,7 +571,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: 10,
                 ),
-                TextFormField(
+                if (!isBulkNumberSelected) // Conditionally include TextFormField
+                  TextFormField(
                     controller: recipientsController,
                     maxLines: 3,
                     decoration: const InputDecoration(
@@ -428,7 +590,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         return 'Please enter your recipient number';
                       }
                       return null;
-                    }),
+                    },
+                  ),
                 SizedBox(
                   height: screenHeight(context) * 0.04,
                 ),
@@ -477,11 +640,35 @@ class _HomeScreenState extends State<HomeScreen> {
                       _sendMessage();
                     }
                   },
-                  text: 'Send Message',
+                  text: _isLoggingIn ? '' : 'Send Message',
                   bgcolor: nbPrimarycolor,
                   fgcolor: nbSecondarycolor,
                   width: screenWidth(context) * 0.95,
                   textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Visibility(
+                        visible: _isLoggingIn,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2.0,
+                          backgroundColor:
+                              Colors.grey, // Set the background color
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                      Visibility(
+                        visible: !_isLoggingIn,
+                        child: Text(
+                          'Send Message',
+                          style: TextStyle(
+                            color: nbSecondarycolor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: screenHeight(context) * 0.03,

@@ -27,10 +27,13 @@ class DrawerWidget extends StatefulWidget {
 class _DrawerWidgetState extends State<DrawerWidget> {
   String? name = '';
   String? email = '';
-
+  late UserProfileProvider _userProfileProvider;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   @override
   void initState() {
     super.initState();
+    _userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
     _fetchProfile();
   }
 
@@ -75,8 +78,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       final response = await fetchProfile(username, password);
 
       if (response != null) {
-        Provider.of<UserProfileProvider>(context, listen: false)
-            .setProfile(response['name'], response['email']);
+        _userProfileProvider.setProfile(response['name'], response['email']);
       } else {
         // Handle error
       }
@@ -178,8 +180,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               SharedPreferences pref = await SharedPreferences.getInstance();
               await pref.clear();
 
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+              _navigatorKey.currentState?.pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
                   (route) => false);
             },
           ),
