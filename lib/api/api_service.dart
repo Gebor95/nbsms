@@ -21,6 +21,56 @@ Future<String> fetchBalance(String username, String password) async {
     return "Error fetching balance";
   }
 }
+// Future<List<Map<String, dynamic>>> fetchNumberList() async {
+//   final apiUrl = 'https://portal.fastsmsnigeria.com/api/';
+//   final queryParams = {
+//     'username': 'ospivvsms@gmail.com',
+//     'password': 'ospivv2018',
+//     'action': 'numbers',
+//   };
+
+//   final uri = Uri.parse(apiUrl);
+//   final response = await http.get(uri.replace(queryParameters: queryParams));
+
+//   if (response.statusCode == 200) {
+//     final data = json.decode(response.body) as List<dynamic>;
+//     return data.map<Map<String, dynamic>>((item) {
+//       return {
+//         'id': item['id'] as int,
+//         'name': item['name'] as String,
+//       };
+//     }).toList();
+//   } else {
+//     throw Exception('Failed to fetch number list');
+//   }
+// }
+
+Future<List<Map<String, dynamic>>> fetchBulkNumber(
+    String username, String password) async {
+  var data = {
+    "username": username,
+    "password": password,
+    "action": "numbers",
+  };
+  final response = await http
+      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+  // if (response.statusCode == 200) {
+  //   final responseData = json.decode(response.body) as List<dynamic>;
+  // final List<dynamic> responseData = json.decode(response.body);
+  // print(responseData);
+  //  return responseData.cast<Map<String, dynamic>>();
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body) as List<dynamic>;
+    return responseData.map<Map<String, dynamic>>((item) {
+      return {
+        'id': item['id'] as int,
+        'name': item['name'] as String,
+      };
+    }).toList();
+  } else {
+    throw Exception('Failed to load data');
+  }
+}
 
 Future<String> fetchPaymentHistory(String username, String password) async {
   var data = {

@@ -87,9 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         // Save the fetched profile in SharedPreferences
         prefs.setString('profile', jsonEncode(fetchedProfile));
-      } else {
-        print("Error fetching profile");
-      }
+      } else {}
     }
   }
 

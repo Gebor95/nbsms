@@ -19,6 +19,16 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
     super.initState();
   }
 
+  String _getInitials(String name) {
+    List<String> names = name.split(' ');
+    if (names.length > 1) {
+      return '${names[0][0]}${names[1][0]}'.toUpperCase();
+    } else if (names.length == 1) {
+      return names[0][0].toUpperCase();
+    }
+    return '?';
+  }
+
   Future<List<Contactt>> fetchAndPrintContacts() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
@@ -76,15 +86,20 @@ class _PersonalContWidgetState extends State<PersonalContWidget> {
               );
             } else {
               return ListView.builder(
+                shrinkWrap: true,
                 itemCount: contacts.length,
                 itemBuilder: (context, index) {
                   final contact = contacts[index];
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: nbPrimarycolor,
-                      child: Icon(
-                        Icons.person,
-                        color: nbSecondarycolor,
+                      child: Text(
+                        _getInitials(contact.name),
+                        style: TextStyle(
+                          color: nbSecondarycolor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     title: Text(contact.name),

@@ -5,7 +5,6 @@ import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_images.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
-import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:url_launcher/link.dart';
 import 'package:nbsms/widgets/submit_button.dart';
@@ -24,6 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _passwordVisible = false;
   bool _isLoggingIn = false;
 
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController pwordController = TextEditingController();
 
@@ -33,11 +36,17 @@ class _LoginScreenState extends State<LoginScreen> {
     checkLogin();
   }
 
+  void _showSnackBar(String message) {
+    _scaffoldMessengerKey.currentState
+        ?.showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void checkLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String? val = pref.getString("login");
     if (val == "logged_in") {
-      goToReplace(context, const HomeScreen());
+      navigatorKey.currentState?.pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()));
     }
   }
 
@@ -73,10 +82,12 @@ class _LoginScreenState extends State<LoginScreen> {
           }
 
           pageRoute("logged_in");
-          goToReplace(context, const HomeScreen());
+          navigatorKey.currentState?.pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomeScreen()));
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Invalid Credentials")));
+          _showSnackBar("Invalid Credentials");
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //     const SnackBar(content: Text("Invalid Credentials")));
         }
       } else {}
     } catch (error) {
@@ -91,12 +102,13 @@ class _LoginScreenState extends State<LoginScreen> {
   void pageRoute(String status) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setString("login", status);
-    goToReplace(context, const HomeScreen());
+    navigatorKey.currentState?.pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
-    // final userProvider = Provider.of<UserProvider>(context);
+    //final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(

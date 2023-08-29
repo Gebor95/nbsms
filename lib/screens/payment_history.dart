@@ -193,52 +193,56 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                 ),
               ),
               const Spacer(),
-              Container(
-                clipBehavior: Clip.none,
-                width: 150,
-                height: 50,
-                child: CustomDropdown(
-                  fieldSuffixIcon: const Icon(
-                    Icons.arrow_drop_down_sharp,
-                    size: 25,
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(color: Colors.black12),
-                  selectedStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400),
-                  hintText: 'All',
-                  hintStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400),
-                  items: const [
-                    'All',
-                    'Offline',
-                    'Online',
-                  ],
-                  controller: smsCatCtrl,
-                  onChanged: (selectedValue) {
-                    setState(() {
-                      selectedStatus = selectedValue;
-                    });
-
-                    if (selectedStatus == 'All') {
-                      fetchPaymentHistory(selectedStatus);
-                    } else {
-                      // Use cached data for offline/online
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: Container(
+                  clipBehavior: Clip.none,
+                  width: 150,
+                  height: 50,
+                  child: CustomDropdown(
+                    fieldSuffixIcon: const Icon(
+                      Icons.arrow_drop_down_sharp,
+                      size: 25,
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Colors.black12),
+                    selectedStyle: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400),
+                    hintText: 'All',
+                    hintStyle: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400),
+                    items: const [
+                      'All',
+                      'Offline',
+                      'Online',
+                    ],
+                    controller: smsCatCtrl,
+                    onChanged: (selectedValue) {
                       setState(() {
-                        history = cachedPaymentHistory.where((payment) {
-                          bool isOfflineRecharge = payment['reference'] == null;
-                          return isOfflineRecharge
-                              ? selectedStatus == 'Offline'
-                              : selectedStatus == 'Online';
-                        }).toList();
-                        paymentFetched = true;
+                        selectedStatus = selectedValue;
                       });
-                    }
-                  },
+
+                      if (selectedStatus == 'All') {
+                        fetchPaymentHistory(selectedStatus);
+                      } else {
+                        // Use cached data for offline/online
+                        setState(() {
+                          history = cachedPaymentHistory.where((payment) {
+                            bool isOfflineRecharge =
+                                payment['reference'] == null;
+                            return isOfflineRecharge
+                                ? selectedStatus == 'Offline'
+                                : selectedStatus == 'Online';
+                          }).toList();
+                          paymentFetched = true;
+                        });
+                      }
+                    },
+                  ),
                 ),
               ),
             ],

@@ -2,12 +2,6 @@
     package="com.example.nbsms">
     <uses-permission android:name="android.permission.READ_CONTACTS" />  
 <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-<intent-filter>
-    <action android:name="android.intent.action.VIEW" />
-    <category android:name="android.intent.category.DEFAULT" />
-    <category android:name="android.intent.category.BROWSABLE" />
-    <data android:scheme="https" android:host="portal.nigeriabulksms.com" />
-</intent-filter>
 
    <application
         android:label="nbsms"

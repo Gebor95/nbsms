@@ -7,7 +7,7 @@ class AppEntryPoint extends StatefulWidget {
   const AppEntryPoint({super.key});
 
   @override
-  _AppEntryPointState createState() => _AppEntryPointState();
+  State<AppEntryPoint> createState() => _AppEntryPointState();
 }
 
 class _AppEntryPointState extends State<AppEntryPoint> {
