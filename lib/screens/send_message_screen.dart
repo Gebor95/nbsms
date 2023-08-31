@@ -44,6 +44,11 @@ class _SendMessageState extends State<SendMessage> {
   }
 
   Future<void> _sendMessage() async {
+    const snack = SnackBar(
+      content: Text("Sending"),
+      duration: Duration(seconds: 5),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snack);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';

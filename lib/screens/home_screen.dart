@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -114,6 +115,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _sendMessage() async {
+    const snack = SnackBar(
+      content: Text("Sending"),
+      duration: Duration(seconds: 5),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snack);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
