@@ -61,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Contactt> contacts = await fetchAndPrintContacts();
 
     if (mounted) {
-      // Check if the widget is still mounted
       setState(() {
         personalContacts = contacts;
       });
@@ -73,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _alertTimer?.cancel();
     SharedPreferences.getInstance().then((prefs) {
       prefs.setBool('hasShownAlert', false);
-    }); // Cancel the timer if it's active
+    });
     recipientsController.dispose();
     senderNameController.dispose();
     messageController.dispose();
@@ -89,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Contactt> fetchedContacts = await fetchContacts(username, password);
       return fetchedContacts;
     } catch (e) {
-      return []; // Return an empty list in case of an error
+      return [];
     }
   }
 
@@ -102,19 +101,19 @@ class _HomeScreenState extends State<HomeScreen> {
       List<Map<String, dynamic>> fetchedBulkNumber =
           await fetchBulkNumber(username, password);
 
-      // Add a selected flag to each item
       List<Map<String, dynamic>> bulkNumbersWithSelection =
           fetchedBulkNumber.map((data) {
         return {
           'name': data['name'] as String,
-          'selected': false,
+          'number': data['id'].toString(),
+          'selected': false
         };
       }).toList();
-
+      print(bulkNumbersWithSelection);
       return bulkNumbersWithSelection;
     } catch (e) {
       print('Error fetching bulk numbers: $e');
-      return []; // Return an empty list or handle the error case as needed
+      return [];
     }
   }
 
@@ -124,23 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
       fetchedBulkNumbersWithSelection = bulkNumbers;
     });
   }
-
-  // Future<List<String>> _fetchBulkNumber() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String username = prefs.getString('username') ?? '';
-  //   String password = prefs.getString('password') ?? '';
-
-  //   try {
-  //     List<Map<String, dynamic>> fetchedBulkNumber =
-  //         await fetchBulkNumber(username, password);
-  //     List<String> names =
-  //         fetchedBulkNumber.map((data) => data['name'] as String).toList();
-  //     return names;
-  //   } catch (e) {
-  //     print('Error fetching bulk numbers: $e');
-  //     return []; // Return an empty list or handle the error case as needed
-  //   }
-  // }
 
   Future<void> _loadSavedBalance() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -158,51 +140,161 @@ class _HomeScreenState extends State<HomeScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String username = prefs.getString('username') ?? '';
     String password = prefs.getString('password') ?? '';
-
     String recipients = recipientsController.text;
     String senderName = senderNameController.text;
     String message = messageController.text;
 
     try {
-      final response = await sendMessage(
-          username, password, recipients, senderName, message);
+      if (isBulkNumberSelected) {
+        List<String> selectedBulkNumberIds = [];
+        for (var bulkNumber in fetchedBulkNumbersWithSelection) {
+          if (bulkNumber['selected']) {
+            selectedBulkNumberIds.add(bulkNumber['number']);
+          }
+        }
 
-      final status = response['status'];
-      final count = response['count'];
-      final price = response['price'];
-
-      if (status == 'OK') {
-        double messageCost = double.parse(price.toString());
-        double currentBalance = double.parse(balance.replaceAll('₦', ''));
-        double newBalance = currentBalance - messageCost;
-
-        // Check for insufficient funds
-        if (newBalance < 3) {
-          _scaffoldMessengerState.showSnackBar(
-            const SnackBar(
-              content: Text('Insufficient funds'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        } else {
-          setState(() {
-            balance = '$newBalance';
-          });
-
-          prefs.setString('balance', '$newBalance');
-
-          recipientsController.clear();
-          senderNameController.clear();
-          messageController.clear();
-
+        if (selectedBulkNumberIds.isEmpty) {
           showDialog(
             context: _scaffoldKey.currentContext!,
             builder: (context) => AlertDialog(
-              title: const Text('Message Sent'),
-              content: Text(
-                'Status: $status\nCount: $count\nPrice: ₦$price',
-                style: TextStyle(fontFamily: roboto),
+              title: const Text('Error'),
+              content: const Text('Please select at least one bulk number.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          String selectedBulkNumbers = selectedBulkNumberIds.join(',');
+
+          final response = await sendBulkMessage(
+            username,
+            password,
+            senderName,
+            message,
+            selectedBulkNumbers,
+          );
+
+          if (response['status'] == 'OK') {
+            double messageCost = double.parse(response['price'].toString());
+            double currentBalance = double.parse(balance.replaceAll('₦', ''));
+            double newBalance = currentBalance - messageCost;
+
+            if (newBalance < 3) {
+              _scaffoldMessengerState.showSnackBar(
+                const SnackBar(
+                  content: Text('Insufficient funds'),
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            } else {
+              setState(() {
+                balance = '₦$newBalance';
+              });
+              prefs.setString('balance', '₦$newBalance');
+
+              recipientsController.clear();
+              senderNameController.clear();
+              messageController.clear();
+
+              showDialog(
+                context: _scaffoldKey.currentContext!,
+                builder: (context) => AlertDialog(
+                  title: const Text('Message Sent'),
+                  content: Text(
+                    'Status: ${response['status']}\nCount: ${response['count']}\nPrice: ₦${response['price']}',
+                    style: TextStyle(fontFamily: roboto),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            }
+          } else {
+            showDialog(
+              context: _scaffoldKey.currentContext!,
+              builder: (context) => AlertDialog(
+                title: const Text('Error'),
+                content: const Text('Message sending failed.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
               ),
+            );
+          }
+        }
+      } else {
+        final response = await sendMessage(
+          username,
+          password,
+          recipients,
+          senderName,
+          message,
+        );
+
+        if (response['status'] == 'OK') {
+          double messageCost = double.parse(response['price'].toString());
+          double currentBalance = double.parse(balance.replaceAll('₦', ''));
+          double newBalance = currentBalance - messageCost;
+
+          if (newBalance < 3) {
+            _scaffoldMessengerState.showSnackBar(
+              const SnackBar(
+                content: Text('Insufficient funds'),
+                duration: Duration(seconds: 3),
+              ),
+            );
+          } else {
+            setState(() {
+              balance = '₦$newBalance';
+            });
+            prefs.setString('balance', '₦$newBalance');
+
+            recipientsController.clear();
+            senderNameController.clear();
+            messageController.clear();
+
+            showDialog(
+              context: _scaffoldKey.currentContext!,
+              builder: (context) => AlertDialog(
+                title: const Text('Message Sent'),
+                content: Text(
+                  'Status: ${response['status']}\nCount: ${response['count']}\nPrice: ₦${response['price']}',
+                  style: TextStyle(fontFamily: roboto),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        } else {
+          showDialog(
+            context: _scaffoldKey.currentContext!,
+            builder: (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text('Message sending failed.'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -214,22 +306,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         }
-      } else {
-        showDialog(
-          context: _scaffoldKey.currentContext!,
-          builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Message sending failed.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
       }
     } catch (e) {
       showDialog(
@@ -261,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     String fetchedBalance = await fetchBalance(username, password);
 
-    prefs.setString('balance', fetchedBalance); // Save the fetched balance
+    prefs.setString('balance', fetchedBalance);
 
     if (mounted) {
       setState(() {
@@ -305,10 +381,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Initial Selected Value
   String dropdownvalue = 'New Contacts';
 
-  // List of items in our dropdown menu
   var items = [
     'New Contacts',
     'Personal Contacts',
@@ -341,22 +415,11 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         title: RichText(
-          // Controls visual overflow
           overflow: TextOverflow.clip,
-
-          // Controls how the text should be aligned horizontally
           textAlign: TextAlign.end,
-
-          // Control the text direction
           textDirection: TextDirection.rtl,
-
-          // Whether the text should break at soft line breaks
           softWrap: true,
-
-          // Maximum number of lines for the text to span
           maxLines: 1,
-
-          // The number of font pixels for each logical pixel
           textScaleFactor: 1,
           text: TextSpan(
             text: 'Balance: ',
@@ -435,8 +498,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: const InputDecoration(
                     alignLabelWithHint: true,
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                      borderSide:
+                          BorderSide(width: 1, color: Colors.greenAccent),
                     ),
                     labelText: "Select Contact",
                   ),
@@ -509,42 +572,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                 ],
-
-                // if (dropdownvalue == 'Bulk Numbers') ...[
-                //   SizedBox(
-                //     height: screenHeight(context) * 0.03,
-                //   ),
-                //   if (fetchedBulkNumbers.isNotEmpty)
-                //     Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         Text(
-                //           'Fetched Bulk Numbers:',
-                //           style: TextStyle(
-                //             color: const Color.fromARGB(176, 0, 141, 5),
-                //             fontFamily: roboto,
-                //           ),
-                //         ),
-                //         const SizedBox(height: 8),
-                //         for (String number in fetchedBulkNumbers)
-                //           Text(
-                //             number,
-                //             style: TextStyle(
-                //               fontFamily: roboto,
-                //               fontSize: 14,
-                //             ),
-                //           ),
-                //       ],
-                //     ),
-                //   if (fetchedBulkNumbers.isEmpty)
-                //     Text(
-                //       'No bulk numbers available',
-                //       style: TextStyle(
-                //         color: const Color.fromARGB(176, 0, 141, 5),
-                //         fontFamily: roboto,
-                //       ),
-                //     ),
-                // ],
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   if (dropdownvalue == 'Personal Contacts')
                     personalContacts.isEmpty
@@ -571,7 +598,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: 10,
                 ),
-                if (!isBulkNumberSelected) // Conditionally include TextFormField
+                if (!isBulkNumberSelected)
                   TextFormField(
                     controller: recipientsController,
                     maxLines: 3,
@@ -600,8 +627,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: const InputDecoration(
                       hintText: "OSPIVV",
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                        borderSide:
+                            BorderSide(width: 1, color: Colors.greenAccent),
                       ),
                       label: Text("Sender Name"),
                     ),
@@ -620,8 +647,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: const InputDecoration(
                       hintText: "Message",
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            width: 1, color: Colors.greenAccent), //<-- SEE HERE
+                        borderSide:
+                            BorderSide(width: 1, color: Colors.greenAccent),
                       ),
                       label: Text("Message"),
                     ),
@@ -652,8 +679,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         visible: _isLoggingIn,
                         child: const CircularProgressIndicator(
                           strokeWidth: 2.0,
-                          backgroundColor:
-                              Colors.grey, // Set the background color
+                          backgroundColor: Colors.grey,
                           valueColor:
                               AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
