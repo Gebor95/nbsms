@@ -90,6 +90,26 @@ Future<String> fetchPaymentHistory(String username, String password) async {
   }
 }
 
+Future<Map<String, dynamic>> sendBulkMessage(String username, String password,
+    String senderName, String message, String numbers) async {
+  try {
+    const apiUrl = 'https://portal.fastsmsnigeria.com/api/';
+    final url = Uri.parse(
+        '$apiUrl?username=$username&password=$password&sender=$senderName&message=$message&numbers=$numbers');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      return responseData;
+    } else {
+      throw Exception('Failed to send bulk message');
+    }
+  } catch (e) {
+    throw Exception('An error occurred while sending the bulk message: $e');
+  }
+}
+
 Future<Map<String, dynamic>> sendMessage(
   String username,
   String password,
