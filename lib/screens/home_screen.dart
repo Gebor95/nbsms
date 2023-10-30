@@ -11,6 +11,8 @@ import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/personal_contact_dropdown_widget.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../widgets/drawer_widget.dart';
 
@@ -27,15 +29,19 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoggingIn = false;
   String selectedBulkNumber = '';
   bool hasShownAlert = false;
+  Set<int> selectedContactIndices = <int>{};
   List<String> fetchedBulkNumbers = [];
   List<Map<String, dynamic>> fetchedBulkNumbersWithSelection = [];
   Contactt? selectedContact;
+  List<Contact> deviceContacts = [];
+  Set<String> selectedContactNumbers = {};
   List<Contactt> personalContacts = [];
   List<Contactt> selectedContacts = [];
+  String searchQuery = '';
   late ScaffoldMessengerState _scaffoldMessengerState;
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  List<Contact> displayedDeviceContacts = [];
   Timer? _alertTimer;
   final TextEditingController recipientsController = TextEditingController();
   final TextEditingController senderNameController = TextEditingController();
@@ -47,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchBalance();
     _startAlertTimer();
     _loadSavedBalance();
+    _loadDeviceContacts();
     _loadPersonalContacts();
     _fetchBulkNumberWithSelection();
   }
@@ -64,6 +71,39 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         personalContacts = contacts;
       });
+    }
+  }
+
+  List<Contact> filterContacts(String query) {
+    query = query.toLowerCase();
+    return deviceContacts.where((contact) {
+      final name = contact.displayName?.toLowerCase() ?? '';
+      final phones = contact.phones ?? [];
+
+      if (name.contains(query)) {
+        return true;
+      }
+
+      for (final phone in phones) {
+        if (phone.value?.contains(query) == true) {
+          return true;
+        }
+      }
+
+      return false;
+    }).toList();
+  }
+
+  Future<void> _loadDeviceContacts() async {
+    if (await Permission.contacts.request().isGranted) {
+      Iterable<Contact> contacts = await ContactsService.getContacts();
+      if (mounted) {
+        setState(() {
+          deviceContacts = contacts.toList();
+        });
+      }
+    } else {
+      // Handle permission denied
     }
   }
 
@@ -392,7 +432,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final displayedDeviceContacts =
+        searchQuery.isEmpty ? deviceContacts : filterContacts(searchQuery);
+
     return Scaffold(
+      backgroundColor: Colors.white,
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: false,
@@ -512,6 +556,77 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(
                     height: screenHeight(context) * 0.03,
                   ),
+                if (dropdownvalue == 'Device Contacts') ...[
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Search',
+                      prefixIcon: const Icon(Icons.search),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 5.0), // Adjust the vertical padding
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                            10.0), // Adjust the border radius
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 8),
+                  // Step 1: Wrap the device contact list in a ListView
+                  Container(
+                    height: 300,
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: ListView(
+                      shrinkWrap: true, // This allows the list to scroll
+                      children: [
+                        for (int index = 0;
+                            index < displayedDeviceContacts.length;
+                            index++)
+                          ListTile(
+                            leading: Checkbox(
+                              value: selectedContactIndices.contains(index),
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  if (value != null && value) {
+                                    selectedContactIndices.add(index);
+                                    selectedContactNumbers.add(
+                                        displayedDeviceContacts[index]
+                                            .phones!
+                                            .first
+                                            .value!);
+                                  } else {
+                                    selectedContactIndices.remove(index);
+                                    selectedContactNumbers.remove(
+                                        displayedDeviceContacts[index]
+                                            .phones!
+                                            .first
+                                            .value!);
+                                  }
+                                  recipientsController.text =
+                                      selectedContactNumbers.join(' ');
+                                });
+                              },
+                            ),
+                            title: Text(
+                                displayedDeviceContacts[index].displayName ??
+                                    ''),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (Item phone
+                                    in displayedDeviceContacts[index].phones!)
+                                  Text(phone.value ?? ''),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
                 if (dropdownvalue == 'Bulk Numbers') ...[
                   SizedBox(
                     height: screenHeight(context) * 0.03,
