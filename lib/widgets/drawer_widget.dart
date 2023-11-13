@@ -28,7 +28,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   String? name = '';
   String? email = '';
   late UserProfileProvider _userProfileProvider;
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  // final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   @override
   void initState() {
     super.initState();
@@ -179,10 +179,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             onTap: () async {
               SharedPreferences pref = await SharedPreferences.getInstance();
               await pref.clear();
-
-              _navigatorKey.currentState?.pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
                   (route) => false);
+              // _navigatorKey.currentState?.pushAndRemoveUntil(
+              //     MaterialPageRoute(builder: (_) => const LoginScreen()),
+              //     (route) => false);
             },
           ),
           ListTile(
