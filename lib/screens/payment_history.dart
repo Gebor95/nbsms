@@ -197,7 +197,7 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                 padding: const EdgeInsets.only(right: 20),
                 child: Container(
                   clipBehavior: Clip.none,
-                  width: 150,
+                  width: 120,
                   height: 50,
                   child: CustomDropdown(
                     fieldSuffixIcon: const Icon(
