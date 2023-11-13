@@ -174,6 +174,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
 
           ListTile(
+            leading: const Icon(Icons.wechat_sharp),
+            title: const Text('Support'),
+            onTap: () {
+              goToReplace(context, const SplashScreen());
+            },
+          ),
+
+          ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () async {
@@ -185,13 +193,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               // _navigatorKey.currentState?.pushAndRemoveUntil(
               //     MaterialPageRoute(builder: (_) => const LoginScreen()),
               //     (route) => false);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.whatshot_sharp),
-            title: const Text('Support'),
-            onTap: () {
-              goToReplace(context, const SplashScreen());
             },
           ),
         ],

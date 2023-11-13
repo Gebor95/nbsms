@@ -24,8 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _passwordVisible = false;
   bool _isLoggingIn = false;
 
-  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
+  // final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+  //     GlobalKey<ScaffoldMessengerState>();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   final TextEditingController emailController = TextEditingController();
@@ -37,10 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
     checkLogin();
   }
 
-  void _showSnackBar(String message) {
-    _scaffoldMessengerKey.currentState
-        ?.showSnackBar(SnackBar(content: Text(message)));
-  }
+  // void _showSnackBar(String message) {
+  //   _scaffoldMessengerKey.currentState
+  //       ?.showSnackBar(SnackBar(content: Text(message)));
+  // }
 
   void checkLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
