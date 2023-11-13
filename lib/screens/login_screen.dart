@@ -6,6 +6,7 @@ import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_images.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
+import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/home_screen.dart';
 import 'package:nbsms/widgets/submit_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,9 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
   void checkLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String? val = pref.getString("login");
+    // if (val == "logged_in") {
+    //   navigatorKey.currentState?.pushReplacement(
+    //       MaterialPageRoute(builder: (context) => const HomeScreen()));
+    // }
     if (val == "logged_in") {
-      navigatorKey.currentState?.pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()));
+      goToReplace(context, const HomeScreen());
     }
   }
 
@@ -82,12 +86,13 @@ class _LoginScreenState extends State<LoginScreen> {
           }
 
           pageRoute("logged_in");
-          navigatorKey.currentState?.pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomeScreen()));
+          // navigatorKey.currentState?.pushReplacement(
+          //     MaterialPageRoute(builder: (context) => const HomeScreen()));
+          goToReplace(context, const HomeScreen());
         } else {
-          _showSnackBar("Invalid Credentials");
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //     const SnackBar(content: Text("Invalid Credentials")));
+          // _showSnackBar("Invalid Credentials");
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Invalid Credentials")));
         }
       } else {}
     } catch (error) {
@@ -102,8 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void pageRoute(String status) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setString("login", status);
-    navigatorKey.currentState?.pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()));
+    goToReplace(context, const HomeScreen());
+    // navigatorKey.currentState?.pushReplacement(
+    //     MaterialPageRoute(builder: (context) => const HomeScreen()));
   }
 
   @override

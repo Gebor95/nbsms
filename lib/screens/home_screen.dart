@@ -97,18 +97,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
   }
 
+  // Updated _loadDeviceContacts method
   Future<void> _loadDeviceContacts() async {
     if (await Permission.contacts.request().isGranted) {
       Iterable<Contact> contacts = await ContactsService.getContacts();
+
+      List<Contact> uniqueContacts = [];
+
+      for (Contact contact in contacts) {
+        List<Item>? phones = contact.phones;
+
+        if (phones != null && phones.isNotEmpty) {
+          // Check if the contact is already in uniqueContacts based on the first phone number
+          bool contactExists = uniqueContacts
+              .any((c) => c.phones?.first.value == phones.first.value);
+
+          if (!contactExists) {
+            uniqueContacts.add(contact);
+          }
+        }
+      }
+
       if (mounted) {
         setState(() {
-          deviceContacts = contacts.toList();
+          deviceContacts = uniqueContacts;
         });
       }
     } else {
       // Handle permission denied
     }
   }
+
+  // Future<void> _loadDeviceContacts() async {
+  //   if (await Permission.contacts.request().isGranted) {
+  //     Iterable<Contact> contacts = await ContactsService.getContacts();
+  //     if (mounted) {
+  //       setState(() {
+  //         deviceContacts = contacts.toList();
+  //       });
+  //     }
+  //   } else {
+  //     // Handle permission denied
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -565,10 +596,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       labelText: 'Search',
                       prefixIcon: const Icon(Icons.search),
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 5.0), // Adjust the vertical padding
+                        vertical: 5.0,
+                      ), // Adjust the vertical padding
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(
-                            10.0), // Adjust the border radius
+                          10.0,
+                        ), // Adjust the border radius
                       ),
                     ),
                     onChanged: (value) {
@@ -577,57 +610,71 @@ class _HomeScreenState extends State<HomeScreen> {
                       });
                     },
                   ),
-
                   const SizedBox(height: 8),
-                  // Step 1: Wrap the device contact list in a ListView
                   Container(
                     height: 300,
                     decoration: const BoxDecoration(color: Colors.white),
-                    child: ListView(
-                      shrinkWrap: true, // This allows the list to scroll
-                      children: [
-                        for (int index = 0;
-                            index < displayedDeviceContacts.length;
-                            index++)
-                          ListTile(
-                            leading: Checkbox(
-                              value: selectedContactIndices.contains(index),
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  if (value != null && value) {
-                                    selectedContactIndices.add(index);
-                                    selectedContactNumbers.add(
-                                        displayedDeviceContacts[index]
-                                            .phones!
-                                            .first
-                                            .value!);
-                                  } else {
-                                    selectedContactIndices.remove(index);
-                                    selectedContactNumbers.remove(
-                                        displayedDeviceContacts[index]
-                                            .phones!
-                                            .first
-                                            .value!);
-                                  }
-                                  recipientsController.text =
-                                      selectedContactNumbers.join(' ');
-                                });
-                              },
+                    child: selectedContactNumbers.isEmpty &&
+                            deviceContacts.isEmpty
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: nbPrimaryOpaColor,
                             ),
-                            title: Text(
-                                displayedDeviceContacts[index].displayName ??
-                                    ''),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                for (Item phone
-                                    in displayedDeviceContacts[index].phones!)
-                                  Text(phone.value ?? ''),
-                              ],
-                            ),
+                          )
+                        : ListView(
+                            shrinkWrap: true, // This allows the list to scroll
+                            children: [
+                              for (int index = 0;
+                                  index < displayedDeviceContacts.length;
+                                  index++)
+                                ListTile(
+                                  leading: Checkbox(
+                                    value:
+                                        selectedContactIndices.contains(index),
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        if (value != null && value) {
+                                          selectedContactIndices.add(index);
+                                          selectedContactNumbers.add(
+                                            displayedDeviceContacts[index]
+                                                .phones!
+                                                .first
+                                                .value!
+                                                .replaceAll(' ', ''),
+                                          );
+                                        } else {
+                                          selectedContactIndices.remove(index);
+                                          selectedContactNumbers.remove(
+                                            displayedDeviceContacts[index]
+                                                .phones!
+                                                .first
+                                                .value!
+                                                .replaceAll(' ', ''),
+                                          );
+                                        }
+                                        recipientsController.text =
+                                            selectedContactNumbers.join(' ');
+                                      });
+                                    },
+                                  ),
+                                  title: Text(
+                                    displayedDeviceContacts[index]
+                                            .displayName ??
+                                        '',
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      for (Item phone
+                                          in displayedDeviceContacts[index]
+                                              .phones!)
+                                        Text(phone.value ?? ''),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
-                      ],
-                    ),
                   ),
                 ],
                 if (dropdownvalue == 'Bulk Numbers') ...[
