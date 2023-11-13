@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
+import 'package:nbsms/screens/extract_message.dart';
+
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
+
 import 'package:nbsms/widgets/body_singlescroll_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
@@ -24,6 +28,8 @@ class _MobileExScreenState extends State<MobileExScreen> {
   checkExtract() {
     isExtract = true;
   }
+
+  bool showFilteredNumbers = false;
 
   String balance = " Loading";
   TextEditingController inputController = TextEditingController();
@@ -157,6 +163,7 @@ class _MobileExScreenState extends State<MobileExScreen> {
           height: screenHeight(context) * 0.06,
         ),
         TextFormField(
+          keyboardType: TextInputType.number,
           controller: inputController,
           maxLines: 5,
           decoration: const InputDecoration(
@@ -177,6 +184,9 @@ class _MobileExScreenState extends State<MobileExScreen> {
         SubmitButton(
           onTap: () {
             filterNumbers();
+            setState(() {
+              showFilteredNumbers = filteredNumbers.isNotEmpty;
+            });
           },
           text: 'Extract Numbers',
           bgcolor: nbPrimarycolor,
@@ -184,11 +194,44 @@ class _MobileExScreenState extends State<MobileExScreen> {
           width: screenWidth(context) * 0.95,
           textStyle: TextStyle(fontWeight: fnt500, fontSize: 16.0),
         ),
-        TextField(
-          controller: outputController,
-          maxLines: 10,
-          readOnly: true,
-          decoration: const InputDecoration(labelText: 'Filtered Numbers'),
+        Visibility(
+          visible: showFilteredNumbers,
+          child: TextField(
+            controller: outputController,
+            maxLines: 10,
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: 'Filtered Numbers',
+              suffixIcon: Visibility(
+                visible: showFilteredNumbers && filteredNumbers.isNotEmpty,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.message,
+                      color: nbPrimarycolor,
+                    ),
+                    onPressed: () {
+                      filterNumbers();
+                      setState(() {
+                        showFilteredNumbers = filteredNumbers.isNotEmpty;
+                      });
+                      if (showFilteredNumbers) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ExtractMessage(
+                                filteredNumbers: filteredNumbers,
+                              ),
+                            ));
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         SizedBox(
           height: screenHeight(context) * 0.04,
