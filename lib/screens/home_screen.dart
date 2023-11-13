@@ -1,4 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
+
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:nbsms/api/api_service.dart';
 import 'package:nbsms/constant/constant_colors.dart';
@@ -10,9 +14,8 @@ import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/personal_contact_dropdown_widget.dart';
 import 'package:nbsms/widgets/submit_button.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/drawer_widget.dart';
 

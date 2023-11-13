@@ -21,7 +21,7 @@ Future<String> fetchBalance(String username, String password) async {
     return "Error fetching balance";
   }
 }
-// Future<List<Map<String, dynamic>>> fetchNumberList() async {
+// Future<List<Map<String, dynamic>>> fetchNumberList() async {cmd
 //   final apiUrl = 'https://portal.fastsmsnigeria.com/api/';
 //   final queryParams = {
 //     'username': 'ospivvsms@gmail.com',

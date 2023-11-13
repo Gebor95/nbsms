@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/model/provider.dart';
 import 'package:nbsms/model/user.dart';
@@ -20,6 +21,9 @@ Future main() async {
     ],
     child: MyApp(showOnBoarding: showOnBoarding),
   ));
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 }
 
 class MyApp extends StatelessWidget {
