@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:nbsms/constant/constant_colors.dart';
 import 'package:nbsms/constant/constant_fonts.dart';
 import 'package:nbsms/constant/constant_mediaquery.dart';
 import 'package:nbsms/navigators/goto_helper.dart';
 import 'package:nbsms/screens/extract_message.dart';
-
 import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
-
 import 'package:nbsms/widgets/body_singlescroll_widget.dart';
 import 'package:nbsms/widgets/page_title.dart';
 import 'package:nbsms/widgets/submit_button.dart';
@@ -201,6 +198,7 @@ class _MobileExScreenState extends State<MobileExScreen> {
             maxLines: 10,
             readOnly: true,
             decoration: InputDecoration(
+              // border: InputBorder.none,
               labelText: 'Filtered Numbers',
               suffixIcon: Visibility(
                 visible: showFilteredNumbers && filteredNumbers.isNotEmpty,
