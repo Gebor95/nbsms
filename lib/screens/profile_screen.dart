@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     };
 
     final response = await http
-        .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+        .post(Uri.parse("https://portal.nigeriabulksms.com/api/?"), body: data);
 
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);

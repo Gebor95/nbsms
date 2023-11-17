@@ -198,7 +198,7 @@ class _MobileExScreenState extends State<MobileExScreen> {
             maxLines: 10,
             readOnly: true,
             decoration: InputDecoration(
-              // border: InputBorder.none,
+              border: InputBorder.none,
               labelText: 'Filtered Numbers',
               suffixIcon: Visibility(
                 visible: showFilteredNumbers && filteredNumbers.isNotEmpty,

@@ -296,8 +296,8 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                                     borderSide:
                                         const BorderSide(color: Colors.white)),
                                 trailing: const Icon(
-                                  Icons.wallet_rounded,
-                                  size: 40,
+                                  Icons.check_circle_rounded,
+                                  size: 30,
                                   color: Colors.green,
                                 ),
                                 subtitle: Column(
@@ -310,14 +310,14 @@ class _PaymentHistoryState extends State<PaymentHistory> {
                                           : 'ONLINE RECHARGE',
                                       style: const TextStyle(
                                           color: Colors.green,
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     Text(
                                       '₦ ${history[index]['amount']}',
                                       style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontFamily: roboto,
                                           fontWeight: FontWeight.w600),
                                     ),

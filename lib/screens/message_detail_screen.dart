@@ -148,7 +148,7 @@ class _MessageDetailPersonalScreenState
                         'Sender:                 ${widget.messageDetails.sender}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -156,7 +156,7 @@ class _MessageDetailPersonalScreenState
                         'Mobile:                  ${widget.phoneNumber}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -164,7 +164,7 @@ class _MessageDetailPersonalScreenState
                         'Price:                     ₦${widget.messageDetails.price}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -172,7 +172,7 @@ class _MessageDetailPersonalScreenState
                         'Units:                     ${widget.messageDetails.units}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -180,7 +180,7 @@ class _MessageDetailPersonalScreenState
                         'Length:                  ${widget.messageDetails.length}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -188,7 +188,7 @@ class _MessageDetailPersonalScreenState
                         'Send Date:            ${widget.messageDetails.sendDate}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
@@ -196,7 +196,7 @@ class _MessageDetailPersonalScreenState
                         'Created Date:       ${widget.messageDetails.sendDate}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
@@ -204,7 +204,7 @@ class _MessageDetailPersonalScreenState
                         'Message: \n\n${widget.messageDetails.message}',
                         style: TextStyle(
                             fontFamily: roboto,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                     ],
