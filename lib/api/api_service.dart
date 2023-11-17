@@ -12,7 +12,7 @@ Future<String> fetchBalance(String username, String password) async {
   };
 
   final response = await http
-      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+      .post(Uri.parse("https://portal.nigeriabulksms.com/api/?"), body: data);
 
   if (response.statusCode == 200) {
     var responseData = jsonDecode(response.body);
@@ -53,7 +53,7 @@ Future<List<Map<String, dynamic>>> fetchBulkNumber(
     "action": "numbers",
   };
   final response = await http
-      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+      .post(Uri.parse("https://portal.nigeriabulksms.com/api/?"), body: data);
   // if (response.statusCode == 200) {
   //   final responseData = json.decode(response.body) as List<dynamic>;
   // final List<dynamic> responseData = json.decode(response.body);
@@ -80,7 +80,7 @@ Future<String> fetchPaymentHistory(String username, String password) async {
   };
 
   final response = await http
-      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+      .post(Uri.parse("https://portal.nigeriabulksms.com/api/?"), body: data);
 
   if (response.statusCode == 200) {
     var responseData = jsonDecode(response.body);
@@ -93,7 +93,7 @@ Future<String> fetchPaymentHistory(String username, String password) async {
 Future<Map<String, dynamic>> sendBulkMessage(String username, String password,
     String senderName, String message, String numbers) async {
   try {
-    const apiUrl = 'https://portal.fastsmsnigeria.com/api/';
+    const apiUrl = 'https://portal.nigeriabulksms.com/api/';
     final url = Uri.parse(
         '$apiUrl?username=$username&password=$password&sender=$senderName&message=$message&numbers=$numbers');
 
@@ -117,7 +117,7 @@ Future<Map<String, dynamic>> sendMessage(
   String senderName,
   String message,
 ) async {
-  const apiUrl = 'https://portal.fastsmsnigeria.com/api/';
+  const apiUrl = 'https://portal.nigeriabulksms.com/api/';
 
   final queryParams = {
     'username': username,
@@ -147,7 +147,7 @@ Map<String, dynamic> parseApiResponse(String responseBody) {
 
 Future<List<Map<String, dynamic>>> fetchReports(
     String username, String password) async {
-  var url = Uri.parse("https://portal.fastsmsnigeria.com/api/");
+  var url = Uri.parse("https://portal.nigeriabulksms.com/api/");
 
   var data = {
     "username": username,
@@ -169,7 +169,7 @@ Future<List<Map<String, dynamic>>> fetchReports(
 Future<List<MessageDetails>> fetchMessageDetails(
     String username, String password) async {
   // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint that returns the message history data.
-  var url = Uri.parse("https://portal.fastsmsnigeria.com/api/");
+  var url = Uri.parse("https://portal.nigeriabulksms.com/api/");
   var data = {
     "username": username,
     "password": password,
@@ -190,7 +190,7 @@ Future<List<MessageDetails>> fetchMessageDetails(
 
 Future<List<Map<String, dynamic>>> fetchPayment(
     String username, String password) async {
-  var url = Uri.parse("https://portal.fastsmsnigeria.com/api/");
+  var url = Uri.parse("https://portal.nigeriabulksms.com/api/");
 
   var data = {
     "username": username,
@@ -217,7 +217,7 @@ Future<List<Contactt>> fetchContacts(String username, String password) async {
   };
 
   final response = await http
-      .post(Uri.parse("https://portal.fastsmsnigeria.com/api/?"), body: data);
+      .post(Uri.parse("https://portal.nigeriabulksms.com/api/?"), body: data);
 
   if (response.statusCode == 200) {
     var responseData = jsonDecode(response.body);

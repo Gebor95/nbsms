@@ -7,6 +7,7 @@ import 'package:nbsms/screens/notification_screen.dart';
 import 'package:nbsms/screens/recharge_screen.dart';
 import 'package:nbsms/widgets/drawer_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../constant/constant_colors.dart';
 import '../constant/constant_fonts.dart';
 import '../constant/constant_mediaquery.dart';
@@ -220,11 +221,11 @@ class _MessageWidgetState extends State<MessageWidget> {
                         fontWeight: FontWeight.w400,
                       ),
                       hintText: 'All Status',
-                      hintStyle: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      // hintStyle: const TextStyle(
+                      //   color: Colors.black,
+                      //   fontSize: 20,
+                      //   fontWeight: FontWeight.w400,
+                      // ),
                       items: const [
                         'All Status',
                         'Delivered',
@@ -327,7 +328,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                   ),
                                   trailing: const Icon(
                                     Icons.arrow_forward_ios,
-                                    size: 40,
+                                    size: 20,
                                     color: Colors.black,
                                   ),
                                   title: Text(reportData['send_date']),
@@ -339,7 +340,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                         status,
                                         style: TextStyle(
                                           color: statusColors[status],
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -347,7 +348,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                                         reportData['mobile'].toString(),
                                         style: const TextStyle(
                                           color: Colors.black,
-                                          fontSize: 20,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
