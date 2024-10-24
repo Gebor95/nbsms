@@ -22,7 +22,7 @@ Future<String> fetchBalance(String username, String password) async {
   }
 }
 // Future<List<Map<String, dynamic>>> fetchNumberList() async {cmd
-//   final apiUrl = 'https://portal.fastsmsnigeria.com/api/';
+//   final apiUrl = 'https://portal.nigeriabulksms.com/api/';
 //   final queryParams = {
 //     'username': 'ospivvsms@gmail.com',
 //     'password': 'ospivv2018',
